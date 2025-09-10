@@ -1,0 +1,7 @@
+{
+  "name": "MyJapanese",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

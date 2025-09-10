@@ -1,0 +1,25 @@
+<svg width="3000" height="3000" viewBox="0 0 3000 3000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Full-screen dark background -->
+  <rect width="3000" height="3000" fill="#121212"/>
+
+  <!-- Grouped and transformed elements to scale and center the icon -->
+  <!-- The scale is reduced to make the icon smaller -->
+  <g transform="translate(890, 890) scale(2.5)">
+    <!-- Back Card -->
+    <rect x="128" y="180" width="280" height="200" rx="20" fill="#1f2937" stroke="#374151" stroke-width="8" transform="rotate(-10 268 280)"/>
+  
+    <!-- Front Card -->
+    <rect x="104" y="132" width="280" height="200" rx="20" fill="#4b5563" stroke="#2dd4bf" stroke-width="8"/>
+  
+    <!-- Japanese Character on Front Card: 友 (Tomo - Friend/Companion) -->
+    <text x="244" y="242" 
+          font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'" 
+          font-size="120" 
+          fill="#ffffff" 
+          dominant-baseline="central" 
+          text-anchor="middle"
+          font-weight="bold">
+      友
+    </text>
+  </g>
+</svg>

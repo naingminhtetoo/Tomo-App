@@ -1,0 +1,65 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="dark">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/level-select"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">
+      <h1>練習メニュー</h1>
+      <p>Practice Menu</p>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="dark" [fullscreen]="true">
+  <div id="container">
+    <ion-list lines="none">
+      <ion-item button="true" routerLink="/deck/kanji" detail="false">
+        <ion-icon name="albums-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h2>Kanji（総まとめ）</h2>
+          <p>Review kanji with vocabulary</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item button="true" routerLink="/deck/kanji_master" detail="false">
+        <ion-icon name="albums-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h2>Kanji（漢字マスター）</h2>
+          <p>Review kanji with vocabulary</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item button="true" detail="false" routerLink="/deck/vocab_shinkansen" [disabled]="false">
+        <ion-icon name="layers-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h2>Vocabulary（新完全マスター）</h2>
+          <p>Review your vocabulary</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item button="true" detail="false" routerLink="/deck/vocab_soumatome" [disabled]="false">
+        <ion-icon name="layers-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h2>Vocabulary（総まとめ）</h2>
+          <p>Review your vocabulary</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item button="true" routerLink="/deck/adverb" detail="false">
+        <ion-icon name="grid-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h2>Adverb</h2>
+          <p>Practice common adverbs</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item button="true" detail="false" routerLink="/deck/other" [disabled]="false">
+        <ion-icon name="apps-outline" slot="start" color="tertiary"></ion-icon>
+        <ion-label>
+          <h2>Others</h2>
+          <p>Review your useful words</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

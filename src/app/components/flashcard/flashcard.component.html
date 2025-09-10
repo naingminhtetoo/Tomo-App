@@ -1,0 +1,23 @@
+<div class="perspective-container">
+  <div class="card-flipper" [class.is-flipped]="isFlipped">
+    <!-- Card Front -->
+    <div class="card-face card-front" (click)="onCardClick()">
+      @if (card; as c) {
+        <span class="word-text">{{ c.word }}</span>
+      } @else {
+        <span class="info-text">No cards available.</span>
+      }
+    </div>
+
+    <!-- Card Back -->
+    <div class="card-face card-back" (click)="onCardClick()">
+      @if (card; as c) {
+        <div class="back-content">
+          <h3>{{ c.word }}</h3>
+          <p class="reading-text">{{ c.reading }}</p>
+          <h2 class="meaning-text">{{ c.meaning }}</h2>
+        </div>
+      }
+    </div>
+  </div>
+</div>

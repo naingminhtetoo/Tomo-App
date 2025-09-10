@@ -1,0 +1,123 @@
+// This page uses the same styling as the home page for consistency.
+// All custom colors are inherited from theme/variables.scss.
+
+ion-header ion-toolbar {
+  --padding-top: var(--ion-safe-area-top);
+  --padding-bottom: 0.5rem;
+}
+
+ion-title {
+  padding-top: 1rem;
+  h1 {
+    // Use clamp() for a responsive font size
+    font-size: clamp(1.8rem, 5vw, 1.8rem);
+    font-weight: bold;
+    color: var(--ion-color-tertiary);
+  }
+  p {
+    // Use clamp() for a responsive font size
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    color: #888;
+  }
+}
+
+#container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; // Center the list vertically
+  height: 100%;
+}
+
+ion-list {
+  width: 100%;
+  max-width: 500px;
+  background: transparent;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+ion-item {
+  --background: var(--ion-item-bgcolor);
+  --border-radius: 1rem;
+  // Reduce vertical padding to make items more compact
+  --inner-padding-top: 0.8rem;
+  --inner-padding-bottom: 0.8rem;
+  // Reduce bottom margin
+  margin-bottom: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+
+  ion-label {
+    h2 {
+      // Reduce heading font size
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: var(--ion-color-tertiary);
+    }
+    p {
+      // Adjust paragraph font size
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+}
+
+// Styles for the new developer footer
+.developer-footer {
+  ion-toolbar {
+    --background: var(--ion-color-dark);
+    text-align: center;
+    // Reduce padding for a thinner footer
+    --padding-top: 4px;
+    --padding-bottom: 4px;
+    --min-height: auto;
+  }
+
+  p {
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin: 0;
+  }
+  .developer {
+    color: var(--ion-color-tertiary);
+  }
+}
+
+ion-toolbar {
+  position: relative;
+}
+
+ion-toolbar {
+  position: relative;
+}
+
+// Styles for the new theme toggle
+.theme-toggle-item {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  --background: transparent;
+
+  ion-icon {
+    font-size: 1.1rem;
+    color: #6b7280; // Inactive color
+    transition: color 0.3s ease-in-out;
+
+    &.active {
+      color: var(--ion-color-tertiary); // Active color
+    }
+  }
+
+  ion-toggle {
+    --handle-background: var(--ion-color-tertiary);
+    --handle-background-checked: #fff;
+    --background: #374151;
+    --background-checked: var(--ion-color-tertiary);
+    margin: 0 8px;
+    height: 24px;
+    width: 44px;
+  }
+}

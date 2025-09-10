@@ -1,0 +1,67 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="dark">
+    <ion-title class="ion-text-center">
+      <h1>レベル選択</h1>
+      <p>Level Select</p>
+    </ion-title>
+    <!-- New Theme Toggle
+    <ion-buttons slot="end">
+      <ion-item lines="none" class="theme-toggle-item">
+        <ion-icon name="sunny-outline" slot="start" [class.active]="themeService.currentTheme() === 'light'"></ion-icon>
+        <ion-toggle
+          [checked]="themeService.currentTheme() === 'dark'"
+          (ionChange)="themeService.toggleTheme()">
+        </ion-toggle>
+        <ion-icon name="moon-outline" slot="end" [class.active]="themeService.currentTheme() === 'dark'"></ion-icon>
+      </ion-item>
+    </ion-buttons> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content color="dark" [fullscreen]="true">
+  <div id="container">
+    <ion-list lines="none">
+      <ion-item button="true" (click)="selectLevel('n5')" detail="false" [disabled]="true">
+        <ion-label>
+          <h2>N5</h2>
+          <p>Beginner Level (Coming Soon)</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item button="true" (click)="selectLevel('n4')" detail="false" [disabled]="true">
+        <ion-label>
+          <h2>N4</h2>
+          <p>Elementary Level (Coming Soon)</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item button="true" (click)="selectLevel('n3')" detail="false" [disabled]="true">
+        <ion-label>
+          <h2>N3</h2>
+          <p>Intermediate Level (Coming Soon)</p>
+        </ion-label>
+      </ion-item>
+      
+      <ion-item button="true" (click)="selectLevel('n2')" detail="false" >
+        <ion-label>
+          <h2>N2</h2>
+          <p>Pre-Advanced Level</p>
+        </ion-label>
+      </ion-item>
+
+      <ion-item button="true" detail="false" [disabled]="true">
+        <ion-label>
+          <h2>N1</h2>
+          <p>Advanced Level (Coming Soon)</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border developer-footer">
+  <ion-toolbar color="dark">
+    <p>Developed by <strong class="developer">naingminhtetoo</strong></p>
+  </ion-toolbar>
+</ion-footer>
+
