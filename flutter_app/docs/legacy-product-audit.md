@@ -91,8 +91,8 @@ are not evidence of tested product behavior.
 Separate app in `flutter_app/`. Use immutable domain types, explicit level
 context, a single category model, validated legacy JSON conversion, repository
 interfaces, and a composition root. Supply the unchanged bundled N2 as an
-offline seed. Remote -> validated cache -> bundled fallback is an intentional
-v2 improvement. Cache write failure must not invalidate downloaded content.
+offline seed. Validated cache/bundled startup with optional version-gated remote refresh is
+an intentional v2 improvement. Cache write failure must not invalidate downloaded content.
 Build only a level/menu shell with content availability and theme support;
 defer flashcard UI, session persistence, shuffle interaction, and full learning
 features. Keep their observed contracts above for the next migration phase.
