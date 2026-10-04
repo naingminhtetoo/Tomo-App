@@ -7,10 +7,11 @@ class JsonHttpClient {
   final http.Client client;
   Future<String> get(Uri uri) async {
     final response = await client.get(uri).timeout(const Duration(seconds: 8));
-    if (response.statusCode != 200)
+    if (response.statusCode != 200) {
       throw ContentException(
         'Content request failed (${response.statusCode}).',
       );
+    }
     return utf8.decode(response.bodyBytes);
   }
 }

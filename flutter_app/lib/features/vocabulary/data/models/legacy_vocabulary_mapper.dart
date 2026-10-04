@@ -12,7 +12,9 @@ class LegacyVocabularyMapper {
   LevelContent decode(String source, {required JlptLevel expectedLevel}) {
     final root = _object(jsonDecode(source));
     if (JlptLevel.tryParse(root['level'] as String?) != expectedLevel) {
-      throw const ContentException('Content level does not match the requested level.');
+      throw const ContentException(
+        'Content level does not match the requested level.',
+      );
     }
     final categories = <DeckCategory, List<VocabularyChapter>>{};
     final ids = <String>{};
@@ -31,22 +33,43 @@ class LegacyVocabularyMapper {
         final words = _list(chapter['words']);
         for (var wi = 0; wi < words.length; wi++) {
           final word = _object(words[wi]);
-          final id = word['id'] == null ? '$chapterId/$wi' : _string(word['id']);
-          if (id.isEmpty || !ids.add(id)) throw const ContentException('Duplicate or empty card ID.');
+          final id = word['id'] == null
+              ? '$chapterId/$wi'
+              : _string(word['id']);
+          if (id.isEmpty || !ids.add(id)) {
+            throw const ContentException('Duplicate or empty card ID.');
+          }
           final meanings = word['meanings'] == null
               ? [_string(word['meaning'])]
               : _list(word['meanings']).map(_string).toList();
-          if (meanings.isEmpty) throw const ContentException('Card has no meanings.');
-          cards.add(VocabularyCard(
-            id: id, word: _string(word['word']), reading: _string(word['reading']),
-            meanings: meanings, level: expectedLevel, category: category, chapter: name,
-            exampleSentence: word['exampleSentence'] == null ? null : _string(word['exampleSentence']),
-            exampleTranslation: word['exampleTranslation'] == null ? null : _string(word['exampleTranslation']),
-            tags: word['tags'] == null ? const [] : _list(word['tags']).map(_string).toList(),
-            difficulty: word['difficulty'] as int?,
-          ));
+          if (meanings.isEmpty) {
+            throw const ContentException('Card has no meanings.');
+          }
+          cards.add(
+            VocabularyCard(
+              id: id,
+              word: _string(word['word']),
+              reading: _string(word['reading']),
+              meanings: meanings,
+              level: expectedLevel,
+              category: category,
+              chapter: name,
+              exampleSentence: word['exampleSentence'] == null
+                  ? null
+                  : _string(word['exampleSentence']),
+              exampleTranslation: word['exampleTranslation'] == null
+                  ? null
+                  : _string(word['exampleTranslation']),
+              tags: word['tags'] == null
+                  ? const []
+                  : _list(word['tags']).map(_string).toList(),
+              difficulty: word['difficulty'] as int?,
+            ),
+          );
         }
-        chapters.add(VocabularyChapter(id: chapterId, name: name, cards: cards));
+        chapters.add(
+          VocabularyChapter(id: chapterId, name: name, cards: cards),
+        );
       }
       categories[category] = chapters;
     }
@@ -54,15 +77,21 @@ class LegacyVocabularyMapper {
   }
 
   Map<String, dynamic> _object(Object? value) {
-    if (value is! Map<String, dynamic>) throw const ContentException('Expected a JSON object.');
+    if (value is! Map<String, dynamic>) {
+      throw const ContentException('Expected a JSON object.');
+    }
     return value;
   }
+
   List<dynamic> _list(Object? value) {
     if (value is! List) throw const ContentException('Expected a JSON array.');
     return value;
   }
+
   String _string(Object? value) {
-    if (value is! String) throw const ContentException('Expected a text field.');
+    if (value is! String) {
+      throw const ContentException('Expected a text field.');
+    }
     return value;
   }
 }

@@ -6,5 +6,8 @@ abstract interface class VocabularyRepository {
   Future<ContentSnapshot> loadLocal(JlptLevel level);
 
   /// Optional version-gated refresh. Caller retains usable local data on failure.
-  Future<ContentSnapshot?> checkForUpdate(JlptLevel level, {required int currentVersion});
+  Future<ContentSnapshot?> checkForUpdate(
+    JlptLevel level, {
+    required int currentVersion,
+  });
 }

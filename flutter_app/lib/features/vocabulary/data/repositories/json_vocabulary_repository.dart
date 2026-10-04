@@ -19,21 +19,32 @@ class JsonVocabularyRepository implements VocabularyRepository {
 
   @override
   Future<ContentSnapshot> loadLocal(JlptLevel level) async {
-    CachedContent? cached;
+    ContentSnapshot? cached;
     try {
-      cached = await local.readCache(level);
-      if (cached != null) mapper.decode(cached.json, expectedLevel: level);
+      final data = await local.readCache(level);
+      if (data != null && data.version > 0) {
+        cached = _snapshot(data, level, ContentSource.cache);
+      }
     } catch (_) {
       cached =
           null; // A corrupt/unavailable cache must not prevent offline startup.
     }
-    final bundled = await local.readBundle(level);
+    ContentSnapshot? bundled;
+    try {
+      final data = await local.readBundle(level);
+      if (data != null && data.version > 0) {
+        bundled = _snapshot(data, level, ContentSource.bundled);
+      }
+    } catch (_) {
+      // A valid cache is still useful if bundled content cannot be read.
+    }
     if (cached != null &&
         (bundled == null || cached.version >= bundled.version)) {
-      return _snapshot(cached, level, ContentSource.cache);
+      return cached;
     }
-    if (bundled != null)
-      return _snapshot(bundled, level, ContentSource.bundled);
+    if (bundled != null) {
+      return bundled;
+    }
     throw ContentException('No local content is available for ${level.label}.');
   }
 

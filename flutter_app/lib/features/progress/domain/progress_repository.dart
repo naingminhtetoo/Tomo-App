@@ -5,7 +5,11 @@ abstract interface class ProgressRepository {
 }
 
 class ReviewProgress {
-  const ReviewProgress({required this.cardId, required this.reviewCount, this.lastReviewedAt});
+  const ReviewProgress({
+    required this.cardId,
+    required this.reviewCount,
+    this.lastReviewedAt,
+  });
   final String cardId;
   final int reviewCount;
   final DateTime? lastReviewedAt;

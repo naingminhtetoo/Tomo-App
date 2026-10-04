@@ -15,7 +15,8 @@ class VocabularyCard {
     this.exampleTranslation,
     List<String> tags = const [],
     this.difficulty,
-  }) : meanings = List.unmodifiable(meanings), tags = List.unmodifiable(tags);
+  }) : meanings = List.unmodifiable(meanings),
+       tags = List.unmodifiable(tags);
 
   final String id;
   final String word;

@@ -5,8 +5,9 @@ import 'content_cache.dart';
 
 class FileContentCache implements ContentCache {
   Future<File> _file(String key) async {
-    if (!RegExp(r'^n[1-5]$').hasMatch(key))
+    if (!RegExp(r'^n[1-5]$').hasMatch(key)) {
       throw ArgumentError.value(key, 'levelKey');
+    }
     final directory = await getApplicationSupportDirectory();
     final cache = Directory('${directory.path}/tomo_content');
     await cache.create(recursive: true);
