@@ -1,0 +1,5 @@
+# Existing tracked Ionic dependencies and output remain in Git.
+# These rules prevent adding further generated files; they do not untrack anything.
+node_modules/
+www/
+.DS_Store
