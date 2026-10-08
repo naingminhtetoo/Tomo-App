@@ -90,6 +90,8 @@ class ActiveStudySession {
   final List<String> contentIds;
 }
 
+/// Home uses today's review counts/accuracy; lifetime metrics are explicit
+/// so the Progress screen does not reset its totals at midnight.
 class ProgressSummaryData {
   const ProgressSummaryData({
     this.reviewedToday = 0,
@@ -100,6 +102,8 @@ class ProgressSummaryData {
     this.correctReviews = 0,
     this.totalReviews = 0,
     this.dueCount = 0,
+    this.lifetimeReviews = 0,
+    this.lifetimeCorrectReviews = 0,
   });
   final int reviewedToday,
       learnedToday,
@@ -108,8 +112,12 @@ class ProgressSummaryData {
       mastered,
       correctReviews,
       totalReviews,
-      dueCount;
+      dueCount,
+      lifetimeReviews,
+      lifetimeCorrectReviews;
   double get accuracy => totalReviews == 0 ? 0 : correctReviews / totalReviews;
+  double get lifetimeAccuracy =>
+      lifetimeReviews == 0 ? 0 : lifetimeCorrectReviews / lifetimeReviews;
 }
 
 class DeckProgress {

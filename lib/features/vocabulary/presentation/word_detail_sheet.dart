@@ -60,10 +60,12 @@ class WordDetailSheet extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
+        Wrap(
+          spacing: 12,
+          runSpacing: 8,
+          alignment: WrapAlignment.spaceBetween,
           children: [
             const TomoBadge('VOCABULARY'),
-            const Spacer(),
             TomoBadge('JLPT ${card.level.label}', accent: false),
           ],
         ),

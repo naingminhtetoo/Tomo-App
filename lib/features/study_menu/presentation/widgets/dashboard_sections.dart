@@ -36,8 +36,14 @@ class ContinueStudyCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              TomoBadge(session == null ? 'READY TO STUDY' : 'IN PROGRESS'),
-              const Spacer(),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: TomoBadge(
+                    session == null ? 'READY TO STUDY' : 'IN PROGRESS',
+                  ),
+                ),
+              ),
               if (session != null)
                 IconButton(
                   tooltip: 'End saved session',

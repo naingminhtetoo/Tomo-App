@@ -367,7 +367,18 @@ class DriftProgressRepository implements ProgressRepository {
       'SELECT * FROM review_history WHERE reviewed_at >= ? AND reviewed_at < ?',
       [Variable(_time(start)), Variable(_time(end))],
     )).where((r) => includes(r.read<String>('content_id'))).toList();
+    final lifetime = (await _rows(
+      "SELECT content_id, COUNT(*) AS reviews, SUM(CASE WHEN rating != 'again' THEN 1 ELSE 0 END) AS correct FROM review_history GROUP BY content_id",
+    )).where((r) => includes(r.read<String>('content_id')));
     return ProgressSummaryData(
+      lifetimeReviews: lifetime.fold(
+        0,
+        (total, r) => total + r.read<int>('reviews'),
+      ),
+      lifetimeCorrectReviews: lifetime.fold(
+        0,
+        (total, r) => total + r.read<int>('correct'),
+      ),
       reviewedToday: history.length,
       totalReviews: history.length,
       correctReviews: history

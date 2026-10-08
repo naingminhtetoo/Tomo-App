@@ -107,12 +107,24 @@ class StudyController extends AsyncNotifier<StudyView> {
       }
       deckId = saved.deckId;
       final original = content.decks.where((d) => d.id == deckId).firstOrNull;
-      ids =
-          original?.contentIds
-              .where(content.vocabulary.containsKey)
-              .toSet()
-              .toList() ??
-          saved.contentIds;
+      if (original != null) {
+        ids = original.contentIds
+            .where(content.vocabulary.containsKey)
+            .toSet()
+            .toList();
+      } else if (deckId.startsWith('all:')) {
+        final source = deckId.substring(4);
+        ids = content.decks
+            .where((d) => (d.source ?? d.category) == source)
+            .expand((d) => d.contentIds)
+            .where(content.vocabulary.containsKey)
+            .toSet()
+            .toList();
+      } else if (deckId.startsWith('review:')) {
+        ids = await _reviewIds(content, deckId.substring(7));
+      } else {
+        ids = saved.contentIds;
+      }
       title =
           content.decks
               .where((d) => d.id == deckId)
@@ -128,22 +140,7 @@ class StudyController extends AsyncNotifier<StudyView> {
     } else if (request.reviewFilter != null) {
       deckId = 'review:${request.reviewFilter}';
       title = _smartTitle(deckId);
-      final items = await switch (request.reviewFilter) {
-        'due' => _repository.getDueItems(),
-        'weak' => _repository.getWeakItems(),
-        'favorites' => _repository.getFavorites(),
-        'recent' => _repository.getRecentlyLearned(),
-        'mistakes' => _repository.getCommonMistakes(),
-        _ => throw ArgumentError('Unknown review collection.'),
-      };
-      ids = items
-          .where(
-            (p) =>
-                p.contentType == ContentType.vocabulary &&
-                content.vocabulary.containsKey(p.contentId),
-          )
-          .map((p) => p.contentId)
-          .toList();
+      ids = await _reviewIds(content, request.reviewFilter!);
     } else {
       final decks = content.decks
           .where(
@@ -211,12 +208,33 @@ class StudyController extends AsyncNotifier<StudyView> {
     return view;
   }
 
+  Future<List<String>> _reviewIds(LevelContent content, String filter) async {
+    final items = await switch (filter) {
+      'due' => _repository.getDueItems(),
+      'weak' => _repository.getWeakItems(),
+      'favorites' => _repository.getFavorites(),
+      'recent' => _repository.getRecentlyLearned(),
+      'mistakes' => _repository.getCommonMistakes(),
+      _ => throw ArgumentError('Unknown review collection.'),
+    };
+    return items
+        .where(
+          (p) =>
+              p.contentType == ContentType.vocabulary &&
+              content.vocabulary.containsKey(p.contentId),
+        )
+        .map((p) => p.contentId)
+        .toList();
+  }
+
   String _smartTitle(String id) => switch (id) {
     'review:due' => 'Due Today',
     'review:weak' => 'Weak Words',
     'review:favorites' => 'Favorites',
     'review:recent' => 'Recently Learned',
     'review:mistakes' => 'Common Mistakes',
+    _ when id.startsWith('all:') => 'All chapters',
+    _ when id.startsWith('word:') => 'Word practice',
     _ => 'Saved session',
   };
   Future<ActiveStudySession> _newSession(StudyView view) async {

@@ -258,4 +258,63 @@ void main() {
       expect((await repository.getWeakItems()).single.contentId, 'difficult');
     },
   );
+  test(
+    'all-chapter resume restores source order when shuffle is turned off',
+    () async {
+      final key = studyRequest(
+        level: JlptLevel.n2,
+        category: DeckCategory.kanji,
+        source: 'kanji',
+        deckId: 'all:kanji',
+        autoStart: true,
+      );
+      final original = await load(key);
+      await controller(key).setShuffle(true);
+      await controller(key).move(3);
+      final saved = (await repository.loadActiveSession())!;
+      final resume = studyRequest(level: JlptLevel.n2, resume: true);
+      final resumed = await load(resume);
+      expect(resumed.ids, saved.contentIds);
+      expect(resumed.index, 3);
+      await controller(resume).setShuffle(false);
+      expect(view(resume).ids, original.ids);
+      expect((await repository.loadActiveSession())!.contentIds, original.ids);
+    },
+  );
+  test(
+    'review resume restores collection order without changing saved membership',
+    () async {
+      final content = (await TestVocabularyRepository().loadLocal(
+        JlptLevel.n2,
+      )).content;
+      final ids = content.vocabulary.keys.take(8).toList();
+      for (final id in ids) {
+        await repository.toggleFavorite(id);
+      }
+      final key = studyRequest(
+        level: JlptLevel.n2,
+        reviewFilter: 'favorites',
+        autoStart: true,
+      );
+      final original = await load(key);
+      await controller(key).setShuffle(true);
+      await controller(key).move(2);
+      final saved = (await repository.loadActiveSession())!;
+      final resume = studyRequest(level: JlptLevel.n2, resume: true);
+      final resumed = await load(resume);
+      expect(resumed.ids, saved.contentIds);
+      expect(resumed.index, 2);
+      await controller(resume).setShuffle(false);
+      expect(view(resume).ids, original.ids);
+      final added = content.vocabulary.keys.skip(8).first;
+      await repository.toggleFavorite(ids.first);
+      await repository.toggleFavorite(added);
+      container.invalidate(studyControllerProvider(resume));
+      await container.read(studyControllerProvider(resume).future);
+      await controller(resume).setShuffle(false);
+      expect(view(resume).ids.toSet(), ids.toSet());
+      expect(view(resume).ids, isNot(contains(added)));
+      expect((await repository.loadActiveSession())!.studyMode, 'review');
+    },
+  );
 }

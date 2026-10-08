@@ -69,7 +69,8 @@ owns reveal, previous/next, explicit shuffle, flags, session start/end and
 review recording. Navigation saves position without recording a review;
 ratings require a revealed answer and atomically record history plus advance
 the saved session. Shuffle restarts at the first card after an in-app
-confirmation; unfinished sessions require confirmation before replacement.
+confirmation; after resume, turning it off restores source/collection order
+without changing saved session membership; unfinished sessions require confirmation before replacement.
 Word Detail reuses the existing component and hides absent metadata.
 
 Review opens real Due Today, Weak Words, Favorites, Recently Learned and
@@ -236,9 +237,12 @@ is explicit, reserved for the future engine. Chapter progress is unique
 learned IDs divided by unique deck IDs; flag-only items are not learned.
 Daily reviewed counts count review events; daily learned counts count first
 exposures. Accuracy uses non-again events / events for the selected day/level.
-Due means nextReviewAt <= now. Weak means incorrect > 0 and incorrect >= correct;
-common mistakes sort items with incorrect > 0 by incorrect count; recent items
-sort by first exposure. Zero history shows zero counts and no accuracy value.
+Due means nextReviewAt <= now. Weak includes difficult flags, latest Hard/Again,
+and incorrect > 0 with incorrect >= correct. Common mistakes sort items with
+incorrect > 0 by incorrect count; recent items sort by first exposure.
+Home uses today's counts/accuracy; Progress uses separate lifetime review
+counts/accuracy, retaining reviews from previous days. Zero history shows zero
+counts and no accuracy value.
 
 Reviews, history, session counters, and next resume position commit atomically.
 Clearing/completing removes the active pointer while preserving session history.
@@ -247,7 +251,8 @@ Sync-status fields provide a future boundary without implementing Supabase.
 
 ## Verification and next work
 
-See [verification results](docs/verification.md) for commands and their actual
+See the [Phase 2 review and device checklist](docs/phase2-audit.md), and
+[verification results](docs/verification.md) for commands and their actual
 outcomes, and [the original product audit](docs/legacy-product-audit.md) for the
 preserved Ionic behavior. The next task should define simple review scheduling
 and mastery rules, then add authored grammar/kanji content and publish a

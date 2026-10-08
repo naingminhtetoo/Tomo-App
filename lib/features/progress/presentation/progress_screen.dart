@@ -191,11 +191,11 @@ class ProgressScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 12),
                       Text('${s.learned} studied · ${s.mastered} mastered'),
-                      Text('${s.totalReviews} lifetime reviews'),
+                      Text('${s.lifetimeReviews} lifetime reviews'),
                       Text(
-                        s.totalReviews == 0
+                        s.lifetimeReviews == 0
                             ? 'Accuracy will appear after your first review.'
-                            : '${(s.accuracy * 100).round()}% lifetime correct',
+                            : '${(s.lifetimeAccuracy * 100).round()}% lifetime correct',
                       ),
                     ],
                   ),
