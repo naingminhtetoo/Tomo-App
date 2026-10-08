@@ -71,3 +71,134 @@ All commits are on `flutter-v2`; no merge into `main` was performed.
 | `b77f1f11` | Dashboard widget decomposition |
 
 The final documentation commit records this report and the migration roadmap.
+
+# Tomo v2 data-foundation verification
+
+This section records the later data-foundation task, extending the existing
+Flutter branch rather than restarting the migration. The earlier Phase 1
+report above describes its own historical verification only.
+
+Current machine: Linux x64, Flutter 3.47.6 / Dart 3.13.5, using the SDK at
+`/workspace/tomo-tools/flutter/bin`. Working directory: `/workspace/Tomo-App`.
+The writable package/config/analyzer caches and SQLite linker alias are
+specified in the root README. No verification, TLS or package-checksum checks
+were disabled. Initial SDK/network/home-directory/library setup failures were
+resolved before the final analyzer/test results below.
+
+| Executed command | Final result |
+| --- | --- |
+| `flutter pub get` | Passed; Drift/SQLite dependencies resolved and lockfile updated |
+| `dart --suppress-analytics format .` | Passed; all 55 Dart files formatted |
+| `dart --suppress-analytics fix --apply --code=curly_braces_in_flow_control_structures,unnecessary_underscores` | Applied standard lint fixes |
+| `flutter analyze` | Passed: no issues found |
+| `flutter test --reporter expanded` | Passed: 39 tests, zero failures/skips |
+| `flutter build apk --debug` | Blocked: no Android SDK installed; no APK produced |
+| `flutter build bundle --debug` | Blocked: default Android target needs Android SDK |
+| `flutter build bundle --debug --target-platform linux-x64` | Passed: application kernel and asset bundle compiled |
+| `git diff --check` | Passed |
+
+The Linux-target bundle is a compilation check, not a packaged desktop app or
+device test. No Android/iOS device or iOS build was run. The project remains at
+the repository root; `assets/data/n2.json` is byte-for-byte unchanged. Remote
+`main` remains at `c3f57ace3f11a37a784eeb308e8302cac76b274d`.
+
+## Tests retained and added
+
+All existing tests remain. The original occurrence counts remain 1,591 kanji
+collection words, 134 kanji-master words, and 87 adverbs. Empty categories and
+Unicode/blank chapter names are preserved. The 1,812 occurrences now resolve
+to 1,747 shared master IDs and 13 decks.
+
+Added/extended coverage verifies:
+
+- Stable IDs across meaning edits, insertion, movement and source membership;
+  deduplicated master content with shared deck references.
+- Rich vocabulary plus separate grammar/kanji parsing, immutable relationships,
+  local Japanese/reading/English/romaji search, and canonical round trips.
+- Schema/manifest versions, safe relative paths, file-version cache reopening,
+  selective vocabulary-only refresh, and unchanged component retention.
+- Invalid JSON/schema/reference/ID updates leave good cached content intact;
+  concurrent refreshes avoid stale or duplicate writes.
+- Drift schema v1 contains user state only; flags preserve counters/scheduling;
+  ratings/history, due/weak/favorites/recent/common-mistake queries, daily
+  accuracy and unique chapter progress derive from actual records.
+- Review + history + session counters + resume position commit atomically;
+  invalid session reviews roll back; completion/clearing retain history;
+  file-database reopening preserves user flags, history and shuffled order.
+- Unsupported database versions fail without deleting valuable existing data.
+- An offline widget study flow records a review, navigates Home and resumes
+  the second card; prior responsive/navigation/preferences tests still pass.
+
+## Remaining scope
+
+No automatic SRS scheduling/mastery algorithm, Supabase/authentication,
+background refresh UI, additional authored JLPT data, audio or release signing
+was added. The remote source is configurable but disabled by default; tests
+use controlled sources, not a live published content service. Legacy
+word/reading corrections require retained published IDs or a deliberate ID
+migration policy. Standalone grammar/kanji study screens are deferred.
+
+Recommended next task: define scheduling/mastery semantics and add device
+coverage, then publish authored content with permanent IDs and a versioned
+manifest. JSON/content, Drift/user-state and SharedPreferences/settings
+boundaries are documented in the root README.
+
+## Files changed in the data-foundation task
+
+53 files, including formatting of existing Dart files by the requested formatter.
+
+```text
+README.md
+assets/data/content-manifest.json
+docs/verification.md
+lib/app/app.dart
+lib/app/providers.dart
+lib/app/router/app_router.dart
+lib/app/router/app_routes.dart
+lib/core/database/app_database.dart
+lib/core/network/json_http_client.dart
+lib/core/storage/content_cache.dart
+lib/core/storage/file_content_cache.dart
+lib/core/utils/content_json.dart
+lib/core/widgets/tomo_scaffold.dart
+lib/features/flashcards/presentation/deck_placeholder_screen.dart
+lib/features/grammar/domain/grammar_content.dart
+lib/features/kanji/domain/kanji_content.dart
+lib/features/level_selection/data/app_preferences.dart
+lib/features/level_selection/data/level_catalog_repository.dart
+lib/features/level_selection/presentation/level_catalog_controller.dart
+lib/features/level_selection/presentation/level_selection_screen.dart
+lib/features/progress/data/README.md
+lib/features/progress/data/drift_progress_repository.dart
+lib/features/progress/domain/progress_repository.dart
+lib/features/progress/presentation/progress_providers.dart
+lib/features/progress/presentation/progress_screen.dart
+lib/features/progress/presentation/review_screen.dart
+lib/features/settings/presentation/preferences_controller.dart
+lib/features/settings/presentation/settings_screen.dart
+lib/features/study_menu/presentation/home_screen.dart
+lib/features/study_menu/presentation/startup_screen.dart
+lib/features/study_menu/presentation/study_menu_screen.dart
+lib/features/study_menu/presentation/widgets/dashboard_sections.dart
+lib/features/vocabulary/data/datasources/local_vocabulary_data_source.dart
+lib/features/vocabulary/data/datasources/remote_vocabulary_data_source.dart
+lib/features/vocabulary/data/models/content_manifest.dart
+lib/features/vocabulary/data/models/legacy_vocabulary_mapper.dart
+lib/features/vocabulary/data/repositories/json_vocabulary_repository.dart
+lib/features/vocabulary/domain/entities/content_example.dart
+lib/features/vocabulary/domain/entities/level_content.dart
+lib/features/vocabulary/domain/entities/study_deck.dart
+lib/features/vocabulary/domain/entities/vocabulary_card.dart
+lib/features/vocabulary/domain/repositories/vocabulary_repository.dart
+lib/features/vocabulary/presentation/vocabulary_controller.dart
+lib/features/vocabulary/presentation/word_detail_sheet.dart
+lib/main.dart
+pubspec.lock
+pubspec.yaml
+test/content_foundation_test.dart
+test/drift_progress_repository_test.dart
+test/json_http_client_test.dart
+test/preferences_and_routing_test.dart
+test/vocabulary_mapper_test.dart
+test/vocabulary_repository_test.dart
+```

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../progress/presentation/progress_providers.dart';
+import '../../../vocabulary/presentation/vocabulary_controller.dart';
+import '../../../vocabulary/domain/entities/deck_category.dart';
+
 import 'package:go_router/go_router.dart';
+
 import '../../../../app/router/app_routes.dart';
 import '../../../level_selection/domain/jlpt_level.dart';
 
-class ContinueStudyCard extends StatelessWidget {
+class ContinueStudyCard extends ConsumerWidget {
   const ContinueStudyCard({super.key, required this.level});
   final JlptLevel level;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Card(
       child: Padding(
@@ -36,6 +43,32 @@ class ContinueStudyCard extends StatelessWidget {
                   icon: const Icon(Icons.arrow_forward),
                   label: const Text('Open study menu'),
                 ),
+                if (ref.watch(activeSessionProvider).value case final session?)
+                  FilledButton.tonal(
+                    onPressed: () async {
+                      final activeLevel = JlptLevel.tryParse(session.level);
+                      if (activeLevel == null) return;
+                      final snapshot = await ref.read(
+                        levelContentProvider(activeLevel).future,
+                      );
+                      final decks = snapshot.content.decks.where(
+                        (d) => d.id == session.deckId,
+                      );
+                      if (!context.mounted || decks.isEmpty) return;
+                      context.pushNamed(
+                        AppRoutes.deck,
+                        pathParameters: {
+                          'level': activeLevel.name,
+                          'category':
+                              (DeckCategory.tryParse(decks.first.category) ??
+                                      DeckCategory.other)
+                                  .contentKey,
+                        },
+                        queryParameters: {'deck': session.deckId},
+                      );
+                    },
+                    child: Text('Resume · card ${session.currentIndex + 1}'),
+                  ),
                 TextButton(
                   onPressed: () => context.pushNamed(AppRoutes.levels),
                   child: const Text('Change level'),
@@ -90,9 +123,13 @@ class StudyGrid extends StatelessWidget {
           ),
           _StudyTile(
             width: width,
-            title: 'Review',
-            subtitle: 'Review system coming soon',
+            title: 'Adverbs',
+            subtitle: 'Study local adverb collections',
             icon: Icons.history,
+            onTap: () => context.pushNamed(
+              AppRoutes.study,
+              pathParameters: {'level': level.name},
+            ),
           ),
         ],
       );
@@ -100,10 +137,11 @@ class StudyGrid extends StatelessWidget {
   );
 }
 
-class ProgressSummary extends StatelessWidget {
-  const ProgressSummary({super.key});
+class ProgressSummary extends ConsumerWidget {
+  const ProgressSummary({super.key, required this.level});
+  final JlptLevel level;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,27 +157,49 @@ class ProgressSummary extends StatelessWidget {
             ),
           ],
         ),
-        const Card(
-          child: Padding(
-            padding: EdgeInsets.all(24),
-            child: Wrap(
-              spacing: 32,
-              runSpacing: 16,
-              children: [
-                _ProgressStat(label: 'Reviewed today'),
-                _ProgressStat(label: 'Learning'),
-                _ProgressStat(label: 'Mastered'),
-              ],
+        ref
+            .watch(progressSummaryProvider(level))
+            .when(
+              loading: () => const LinearProgressIndicator(),
+              error: (_, _) => const Text('Progress could not be loaded.'),
+              data: (summary) => Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Wrap(
+                    spacing: 32,
+                    runSpacing: 16,
+                    children: [
+                      _ProgressStat(
+                        label: 'Reviewed today',
+                        value: '${summary.reviewedToday}',
+                      ),
+                      _ProgressStat(
+                        label: 'Learned today',
+                        value: '${summary.learnedToday}',
+                      ),
+                      _ProgressStat(
+                        label: 'Accuracy today',
+                        value: summary.totalReviews == 0
+                            ? '—'
+                            : '${(summary.accuracy * 100).round()}%',
+                      ),
+                      _ProgressStat(
+                        label: 'Due now',
+                        value: '${summary.dueCount}',
+                      ),
+                      _ProgressStat(
+                        label: 'Learning',
+                        value: '${summary.learning}',
+                      ),
+                      _ProgressStat(
+                        label: 'Mastered',
+                        value: '${summary.mastered}',
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Your progress will appear here when tracking is available.',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
       ],
     );
   }
@@ -175,13 +235,13 @@ class _StudyTile extends StatelessWidget {
 }
 
 class _ProgressStat extends StatelessWidget {
-  const _ProgressStat({required this.label});
-  final String label;
+  const _ProgressStat({required this.label, required this.value});
+  final String label, value;
   @override
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text('—', style: Theme.of(context).textTheme.headlineSmall),
+      Text(value, style: Theme.of(context).textTheme.headlineSmall),
       Text(label),
     ],
   );

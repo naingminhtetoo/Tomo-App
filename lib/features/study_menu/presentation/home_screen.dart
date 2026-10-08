@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/router/app_routes.dart';
 import '../../../core/widgets/async_status.dart';
 import '../../../core/widgets/tomo_scaffold.dart';
@@ -50,7 +51,7 @@ class HomeScreen extends ConsumerWidget {
                 const SizedBox(height: 16),
                 StudyGrid(level: preferences.level),
                 const SizedBox(height: 32),
-                const ProgressSummary(),
+                ProgressSummary(level: preferences.level),
               ],
             ),
           ),

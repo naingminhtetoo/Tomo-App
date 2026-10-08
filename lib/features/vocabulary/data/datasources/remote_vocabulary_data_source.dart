@@ -5,6 +5,7 @@ import '../models/content_manifest.dart';
 abstract interface class RemoteVocabularyDataSource {
   Future<ContentManifest?> fetchManifest();
   Future<String> fetchLevel(JlptLevel level);
+  Future<String> fetchFile(String path);
 }
 
 class HttpRemoteVocabularyDataSource implements RemoteVocabularyDataSource {
@@ -19,6 +20,14 @@ class HttpRemoteVocabularyDataSource implements RemoteVocabularyDataSource {
     return ContentManifest.decode(
       await http.get(uri.resolve('content-manifest.json')),
     );
+  }
+
+  @override
+  Future<String> fetchFile(String path) {
+    final uri = baseUri;
+    if (uri == null) throw StateError('Remote content is not configured.');
+    ContentFile.fromJson({'version': 1, 'path': path});
+    return http.get(uri.resolve(path));
   }
 
   @override

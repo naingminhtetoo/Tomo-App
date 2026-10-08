@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class TomoScaffold extends StatelessWidget {
   const TomoScaffold({
@@ -13,6 +14,25 @@ class TomoScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: Text(title), actions: actions),
+    bottomNavigationBar: NavigationBar(
+      selectedIndex: switch (GoRouterState.of(context).uri.path) {
+        '/review' => 2,
+        '/progress' => 3,
+        final path when path.startsWith('/study') || path == '/levels' => 1,
+        _ => 0,
+      },
+      onDestinationSelected: (index) =>
+          context.go(['/home', '/levels', '/review', '/progress'][index]),
+      destinations: const [
+        NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+        NavigationDestination(
+          icon: Icon(Icons.auto_stories_outlined),
+          label: 'Study',
+        ),
+        NavigationDestination(icon: Icon(Icons.history), label: 'Review'),
+        NavigationDestination(icon: Icon(Icons.bar_chart), label: 'Progress'),
+      ],
+    ),
     body: SafeArea(
       child: Align(
         alignment: Alignment.topCenter,

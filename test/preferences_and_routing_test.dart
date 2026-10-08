@@ -1,4 +1,9 @@
+import 'package:drift/native.dart';
+import 'package:tomo/core/database/app_database.dart';
+import 'package:tomo/features/progress/domain/progress_repository.dart';
+
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -47,6 +52,13 @@ void main() {
       final repository = AppPreferencesRepository(MemoryPreferences());
       final first = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) {
+            final db = AppDatabase(NativeDatabase.memory());
+            ref.onDispose(() {
+              db.close();
+            });
+            return db;
+          }),
           vocabularyRepositoryProvider.overrideWithValue(
             TestVocabularyRepository(),
           ),
@@ -61,6 +73,13 @@ void main() {
       first.dispose();
       final second = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) {
+            final db = AppDatabase(NativeDatabase.memory());
+            ref.onDispose(() {
+              db.close();
+            });
+            return db;
+          }),
           vocabularyRepositoryProvider.overrideWithValue(
             TestVocabularyRepository(),
           ),
@@ -86,6 +105,13 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
+            appDatabaseProvider.overrideWith((ref) {
+              final db = AppDatabase(NativeDatabase.memory());
+              ref.onDispose(() {
+                db.close();
+              });
+              return db;
+            }),
             vocabularyRepositoryProvider.overrideWithValue(
               TestVocabularyRepository(),
             ),
@@ -113,6 +139,13 @@ void main() {
   ) async {
     final container = ProviderContainer(
       overrides: [
+        appDatabaseProvider.overrideWith((ref) {
+          final db = AppDatabase(NativeDatabase.memory());
+          ref.onDispose(() {
+            db.close();
+          });
+          return db;
+        }),
         vocabularyRepositoryProvider.overrideWithValue(
           TestVocabularyRepository(),
         ),
@@ -141,6 +174,13 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          appDatabaseProvider.overrideWith((ref) {
+            final db = AppDatabase(NativeDatabase.memory());
+            ref.onDispose(() {
+              db.close();
+            });
+            return db;
+          }),
           vocabularyRepositoryProvider.overrideWithValue(
             TestVocabularyRepository(),
           ),
@@ -163,4 +203,68 @@ void main() {
     expect(find.text('Settings'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+  testWidgets(
+    'offline study persists review and resume position across navigation',
+    (tester) async {
+      tester.view.physicalSize = const Size(1000, 1200);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final container = ProviderContainer(
+        overrides: [
+          appDatabaseProvider.overrideWith((ref) {
+            final db = AppDatabase(NativeDatabase.memory());
+            ref.onDispose(() {
+              db.close();
+            });
+            return db;
+          }),
+          vocabularyRepositoryProvider.overrideWithValue(
+            TestVocabularyRepository(),
+          ),
+          preferencesRepositoryProvider.overrideWithValue(
+            AppPreferencesRepository(MemoryPreferences()),
+          ),
+        ],
+      );
+      addTearDown(container.dispose);
+      await tester.pumpWidget(
+        UncontrolledProviderScope(container: container, child: const TomoApp()),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('Reviewed today'), findsOneWidget);
+      final router = container.read(appRouterProvider);
+      router.go('/study/n2/deck/kanji');
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Start studying'));
+      await tester.pumpAndSettle();
+      expect(find.text('禁止'), findsOneWidget);
+      await tester.tap(find.text('Tap to reveal'));
+      await tester.pumpAndSettle();
+      expect(find.text('prohibition'), findsOneWidget);
+      await tester.tap(find.text('good'));
+      await tester.pumpAndSettle();
+      final repository = container.read(progressRepositoryProvider);
+      final active = (await repository.loadActiveSession())!;
+      expect(active.currentIndex, 1);
+      expect(
+        (await repository.findByCardId(active.contentIds.first))!.correctCount,
+        1,
+      );
+      expect(
+        (await repository.getReviewHistory(
+          active.contentIds.first,
+        )).single.rating,
+        ReviewRating.good,
+      );
+      router.go('/home');
+      await tester.pumpAndSettle();
+      expect(find.text('Resume · card 2'), findsOneWidget);
+      await tester.tap(find.text('Resume · card 2'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('2 / '), findsOneWidget);
+      expect(find.text('Tap to reveal'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
 }

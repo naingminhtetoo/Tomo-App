@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../core/widgets/tomo_scaffold.dart';
 import '../../features/flashcards/presentation/deck_placeholder_screen.dart';
 import '../../features/level_selection/domain/jlpt_level.dart';
 import '../../features/level_selection/presentation/level_selection_screen.dart';
 import '../../features/progress/presentation/progress_screen.dart';
+import '../../features/progress/presentation/review_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/study_menu/presentation/home_screen.dart';
 import '../../features/study_menu/presentation/startup_screen.dart';
@@ -50,6 +52,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 ? '/levels'
                 : null,
             builder: (_, state) => DeckPlaceholderScreen(
+              deckId: state.uri.queryParameters['deck'],
               level: JlptLevel.tryParse(state.pathParameters['level'])!,
               category: DeckCategory.tryParse(
                 state.pathParameters['category'],
@@ -62,6 +65,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: '/settings',
         name: AppRoutes.settings,
         builder: (_, _) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: '/review',
+        name: AppRoutes.review,
+        builder: (_, _) => const ReviewScreen(),
       ),
       GoRoute(
         path: '/progress',

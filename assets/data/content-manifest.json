@@ -1,1 +1,11 @@
-{"n2":{"version":1}}
+{
+  "schemaVersion": 1,
+  "levels": {
+    "N2": {
+      "version": 1,
+      "files": {
+        "legacy": {"version": 1, "path": "n2.json"}
+      }
+    }
+  }
+}

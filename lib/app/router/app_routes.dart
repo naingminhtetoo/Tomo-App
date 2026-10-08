@@ -6,4 +6,5 @@ class AppRoutes {
   static const deck = 'deck';
   static const settings = 'settings';
   static const progress = 'progress';
+  static const review = 'review';
 }

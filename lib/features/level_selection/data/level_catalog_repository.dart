@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+
 import '../../../core/constants/content_constants.dart';
 import '../../vocabulary/data/models/content_manifest.dart';
 import '../domain/jlpt_level.dart';

@@ -1,6 +1,10 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+
+import '../core/database/app_database.dart';
+import '../features/progress/data/drift_progress_repository.dart';
+import '../features/progress/domain/progress_repository.dart';
 import '../core/constants/content_constants.dart';
 import '../core/network/json_http_client.dart';
 import '../core/storage/file_content_cache.dart';
@@ -34,4 +38,19 @@ final vocabularyRepositoryProvider = Provider<VocabularyRepository>((ref) {
           : Uri.parse(base.endsWith('/') ? base : '$base/'),
     ),
   );
+});
+
+final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  final database = AppDatabase.open();
+  ref.onDispose(() {
+    database.close();
+  });
+  return database;
+});
+final progressRepositoryProvider = Provider<ProgressRepository>((ref) {
+  final repository = DriftProgressRepository(ref.watch(appDatabaseProvider));
+  ref.onDispose(() {
+    repository.close();
+  });
+  return repository;
 });

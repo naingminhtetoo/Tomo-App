@@ -1,4 +1,5 @@
 import 'package:flutter/services.dart';
+
 import '../../../../core/constants/content_constants.dart';
 import '../../../../core/storage/content_cache.dart';
 import '../../../level_selection/domain/jlpt_level.dart';
@@ -30,7 +31,14 @@ class AssetLocalVocabularyDataSource implements LocalVocabularyDataSource {
     if (version == null) return null;
     return CachedContent(
       version: version,
-      json: await bundle.loadString('assets/data/${level.name}.json'),
+      json: await bundle.loadString(
+        'assets/data/${manifest.files[level]?['legacy']?.path ?? '${level.name}.json'}',
+      ),
+      fileVersions: {
+        for (final e
+            in (manifest.files[level] ?? <String, ContentFile>{}).entries)
+          e.key: e.value.version,
+      },
     );
   }
 

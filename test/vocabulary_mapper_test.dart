@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tomo/core/errors/content_exception.dart';
 import 'package:tomo/features/level_selection/domain/jlpt_level.dart';
@@ -26,7 +27,13 @@ void main() {
       expect(first.meanings, ['prohibition']);
       expect(content.chapters(DeckCategory.adverb).single.name, '');
       final cards = DeckCategory.values.expand(content.cards).toList();
-      expect(cards.map((card) => card.id).toSet().length, 1812);
+      expect(cards.length, 1812);
+      expect(
+        cards.map((card) => card.id).toSet().length,
+        content.vocabulary.length,
+      );
+      expect(content.decks.length, 13);
+      expect(content.vocabulary.length, 1747);
       expect(
         mapper
             .decode(source, expectedLevel: JlptLevel.n2)

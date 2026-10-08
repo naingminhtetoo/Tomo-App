@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../errors/content_exception.dart';
 
 class JsonHttpClient {
