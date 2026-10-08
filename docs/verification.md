@@ -202,3 +202,129 @@ test/preferences_and_routing_test.dart
 test/vocabulary_mapper_test.dart
 test/vocabulary_repository_test.dart
 ```
+
+# Tomo v2 coral UI and study-flow verification
+
+Continued the existing root Flutter application on `flutter-v2`, based on
+`97961035998082c3a6dbba6d3a0d885a35b301c8`. Verification used Linux x64 with
+Flutter 3.47.6 / Dart 3.13.5 and the writable caches documented in README.
+The earlier reports above are historical; their Android APK success does not
+apply to this cloud environment.
+
+## Implemented and reused
+
+- Coral Stitch tokens and dark/light ThemeData replace the deprecated teal
+  palette. Shared card, badge, scaffold, buttons, dialogs, progress and bottom
+  navigation styles include bundled, licensed Noto Sans JP typography.
+- Home shows real saved session, level, streak, today's reviews/learned words,
+  accuracy, due count, four category cards and a learning tip.
+- Study supports local search and category/source/chapter selection. Single
+  deck sources skip chapter selection. Chapter totals/progress use shared
+  master IDs and persisted learning state; there are no invented locked
+  chapters or illustrative numbers.
+- Flashcards show actual word/reading, supplied-only metadata, tap/button
+  reveal, previous/next, favorite/difficult, explicit shuffle, four ratings,
+  Word Detail and persistent resume. Session replacement/reordering requires
+  an in-app confirmation. Stale controllers cannot end replacement sessions.
+- Word Detail reuses the existing component. Missing examples, collocations,
+  kanji information, parts of speech and romaji are hidden.
+- Review opens five installed-content collections using real progress/history.
+  Weak queries also include difficult flags and the latest Hard/Again rating.
+- Progress shows unique studied words, category/chapter progress, review totals,
+  accuracy and seven-day activity/streak from review history.
+
+Reused GoRouter, Riverpod, preferences, the content provider/cache/repository,
+legacy mapping, stable content IDs, existing word details and Drift progress
+repository. Study actions now live in a Riverpod controller rather than the
+old placeholder widget. No tables/schema migrations or content changes:
+`assets/data/n2.json` and database schema v1 are unchanged. Ordinary study uses
+local content; opening cards does not fetch remote JSON. Vocabulary and Kanji
+category totals overlap because the original Kanji decks contain vocabulary.
+
+## Executed verification
+
+| Command / check | Result |
+| --- | --- |
+| `flutter pub get` | Passed; font assets registered, no dependency changes |
+| `dart --suppress-analytics format .` | Passed; 66 Dart files formatted |
+| `flutter analyze` | Passed; no issues found |
+| `flutter test --reporter expanded` | Passed; 52 tests, zero failures/skips |
+| `flutter test test/study_ui_flow_test.dart --dart-define=TOMO_CAPTURE_UI=true` | Passed; both phone widths, 11 real-font captures |
+| `flutter build apk --debug` | Could not build: no Android SDK installed; no APK produced |
+| `flutter build bundle --debug --target-platform linux-x64` | Passed; kernel and asset bundle compiled |
+| `git diff --check` | Passed |
+
+The bundle compilation is not an Android build or packaged desktop app.
+No Android/iOS emulator, device run, iOS build or release signing was performed.
+
+All 39 previous tests remain, with assertions updated for the new navigation
+and button labels. Added 13 tests cover controller reveal/navigation/order,
+explicit shuffle/resume, persisted flags/chapter progress, completion,
+empty/missing content, session conflicts/stale controllers, real review
+collections/latest Hard behavior, calendar activity/streak and complete local
+navigation at 320px and 457px. The previous 1100px layout test remains.
+The UI flow also checks search, detail flags propagating to cards, rating,
+Home resume and empty Grammar/Due Today states. Existing file-database tests
+continue to verify persistence across database reopen.
+
+Render captures were inspected for the coral Home and Flashcard references,
+shared colors, Japanese text and button typography. Other captures cover
+Study, sources, chapters, revealed card, details, Review, Progress and empty
+review. These are artifacts at `/workspace/tomo-tools/screenshots` and are
+not golden assertions or committed generated images. Reproduction is in
+README; captures use real N2 content and a single recorded test review.
+
+## Remaining scope and Phase 3
+
+- Audio and richer educational metadata have no supplied backing data; no fake
+  playback controls or educational text were introduced.
+- Due counts are accurate but stay zero until explicit schedules exist. Ratings
+  do not automatically schedule reviews or increase mastery. No SRS algorithm
+  or invented intervals, retention percentages or readiness dates were added.
+- New users see empty content/review states; Grammar and standalone kanji study
+  remain unavailable. The legacy Kanji vocabulary is fully usable.
+- The bundled Japanese font adds about 9 MB before platform packaging.
+- Android device/layout behavior still needs verification with an SDK/emulator.
+
+Recommended Phase 3: define scheduling/mastery semantics and implement a small,
+tested SRS engine; run Android/iOS device smoke tests; publish authored content
+with permanent IDs and real audio/metadata through the existing manifest.
+
+## Files changed in this UI/study task
+
+32 changed paths (including replacement of the flashcard placeholder):
+
+```text
+M	README.md
+A	assets/fonts/NotoSansJP.ttf
+A	assets/fonts/OFL.txt
+M	docs/verification.md
+M	lib/app/router/app_router.dart
+M	lib/app/router/app_routes.dart
+M	lib/app/theme/tomo_theme.dart
+M	lib/core/widgets/tomo_scaffold.dart
+A	lib/core/widgets/ui_action.dart
+D	lib/features/flashcards/presentation/deck_placeholder_screen.dart
+A	lib/features/flashcards/presentation/flashcard_screen.dart
+A	lib/features/flashcards/presentation/study_controller.dart
+M	lib/features/progress/data/drift_progress_repository.dart
+M	lib/features/progress/domain/progress_repository.dart
+A	lib/features/progress/presentation/learning_state_controller.dart
+M	lib/features/progress/presentation/progress_providers.dart
+M	lib/features/progress/presentation/progress_screen.dart
+M	lib/features/progress/presentation/review_screen.dart
+A	lib/features/study_menu/domain/study_catalog.dart
+A	lib/features/study_menu/presentation/catalog_provider.dart
+A	lib/features/study_menu/presentation/category_screen.dart
+A	lib/features/study_menu/presentation/chapter_screen.dart
+M	lib/features/study_menu/presentation/home_screen.dart
+M	lib/features/study_menu/presentation/study_menu_screen.dart
+M	lib/features/study_menu/presentation/widgets/dashboard_sections.dart
+M	lib/features/vocabulary/presentation/word_detail_sheet.dart
+M	pubspec.yaml
+M	test/preferences_and_routing_test.dart
+A	test/study_activity_test.dart
+A	test/study_controller_test.dart
+A	test/study_ui_flow_test.dart
+A	test/support/test_repositories.dart
+```

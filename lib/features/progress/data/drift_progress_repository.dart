@@ -54,6 +54,69 @@ class DriftProgressRepository implements ProgressRepository {
   }
 
   @override
+  Future<StudyActivity> activity({
+    DateTime? now,
+    Set<String>? contentIds,
+  }) async {
+    final current = now ?? _clock();
+    DateTime day(DateTime d) => current.isUtc
+        ? DateTime.utc(d.year, d.month, d.day)
+        : DateTime(d.year, d.month, d.day);
+    final today = day(current);
+    final days = List.generate(
+      7,
+      (i) => current.isUtc
+          ? DateTime.utc(today.year, today.month, today.day - 6 + i)
+          : DateTime(today.year, today.month, today.day - 6 + i),
+    );
+    final counts = List.filled(7, 0);
+    final studiedDays = <DateTime>{};
+    var reviewed = 0, correct = 0;
+    final rows = await _rows(
+      'SELECT content_id,rating,reviewed_at FROM review_history WHERE reviewed_at <= ?',
+      [Variable(_time(current))],
+    );
+    for (final row in rows) {
+      if (contentIds != null &&
+          !contentIds.contains(row.read<String>('content_id'))) {
+        continue;
+      }
+      final time = DateTime.fromMillisecondsSinceEpoch(
+        row.read<int>('reviewed_at'),
+        isUtc: current.isUtc,
+      );
+      final date = day(time);
+      studiedDays.add(date);
+      final index = days.indexOf(date);
+      if (index >= 0) {
+        counts[index]++;
+        reviewed++;
+        if (row.read<String>('rating') != 'again') correct++;
+      }
+    }
+    var cursor = today;
+    if (!studiedDays.contains(cursor)) {
+      cursor = current.isUtc
+          ? DateTime.utc(today.year, today.month, today.day - 1)
+          : DateTime(today.year, today.month, today.day - 1);
+    }
+    var streak = 0;
+    while (studiedDays.contains(cursor)) {
+      streak++;
+      cursor = current.isUtc
+          ? DateTime.utc(cursor.year, cursor.month, cursor.day - 1)
+          : DateTime(cursor.year, cursor.month, cursor.day - 1);
+    }
+    return StudyActivity(
+      days: List.unmodifiable(days),
+      reviewCounts: List.unmodifiable(counts),
+      reviewed: reviewed,
+      correct: correct,
+      streak: streak,
+    );
+  }
+
+  @override
   Future<StudyProgress?> findByCardId(
     String id, {
     ContentType type = ContentType.vocabulary,
@@ -159,7 +222,12 @@ class DriftProgressRepository implements ProgressRepository {
   );
   @override
   Future<List<StudyProgress>> getWeakItems() => _list(
-    'WHERE incorrect_count > 0 AND incorrect_count >= correct_count ORDER BY incorrect_count DESC',
+    '''WHERE difficult=1 OR (incorrect_count > 0 AND incorrect_count >= correct_count)
+    OR EXISTS (SELECT 1 FROM review_history h WHERE h.content_id=study_progress.content_id
+      AND h.content_type=study_progress.content_type AND h.rating IN ('again','hard')
+      AND h.id=(SELECT MAX(latest.id) FROM review_history latest
+        WHERE latest.content_id=h.content_id AND latest.content_type=h.content_type))
+    ORDER BY incorrect_count DESC, updated_at DESC''',
   );
   @override
   Future<void> recordReview(

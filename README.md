@@ -50,19 +50,64 @@ Material 3 Tomo themes, preferences controllers, local/remote vocabulary data
 sources, HTTP client, content cache, legacy mapper and tests. It preserves the
 root project and the unchanged `assets/data/n2.json` fixture.
 
-The dashboard restores the selected level and displays real daily review,
-learning and due counts. Home, Study, Review and Progress have bottom
-navigation. N2 is the only supplied level. The study menu provides local
-search; word details hide metadata absent from legacy content. Chapter study
-supports answer reveal, four review ratings, favorite/difficult toggles, and
-persistent shuffled order. Home resumes an unfinished session. Progress shows
-learned/total counts by chapter. Review queries use actual user state.
+The app now uses the official Stitch coral design: centralized dark/light
+ThemeData, rounded bordered cards, coral buttons and navigation, and bundled
+Noto Sans JP typography. The dashboard restores the selected level and shows
+real daily reviews, learned words, accuracy, streak, due count and category
+progress. Continue Session restores the exact saved card order and position.
 
-This is a data foundation with a minimal study flow, not a complete SRS engine.
+Normal navigation is Home → Study → Category → Source → Chapter → Flashcards
+→ Word Detail. Sources with one deck open it directly. N2 is the only supplied
+level; empty Grammar content is identified clearly. The legacy Kanji sources
+are vocabulary collections and are labeled accordingly. Vocabulary and Kanji
+views share those source memberships, so their totals overlap intentionally.
+Category/source/chapter totals count unique master IDs, rather than duplicated
+legacy occurrences.
+
+Study has local Japanese/reading/English search. The Riverpod study controller
+owns reveal, previous/next, explicit shuffle, flags, session start/end and
+review recording. Navigation saves position without recording a review;
+ratings require a revealed answer and atomically record history plus advance
+the saved session. Shuffle restarts at the first card after an in-app
+confirmation; unfinished sessions require confirmation before replacement.
+Word Detail reuses the existing component and hides absent metadata.
+
+Review opens real Due Today, Weak Words, Favorites, Recently Learned and
+Common Mistakes collections, filtered to installed vocabulary at the selected
+level. Weak words include difficult flags, the latest Hard/Again rating and
+repeated incorrect reviews. Recent words are ordered by first studied date;
+common mistakes contain recorded incorrect reviews. Progress shows unique
+studied words by category/chapter, lifetime accuracy and seven calendar days
+of review activity. Accuracy follows the existing repository convention:
+Hard/Good/Easy count as correct, Again as incorrect. A streak includes today
+or, before today's first review, yesterday.
+
 Ratings record history/counts; no automatic interval, ease or mastery algorithm
-is applied. The repository accepts explicit scheduling values for a future
-engine. Grammar and standalone kanji have models but no fabricated seed data
-or dedicated study UI. Audio, accounts and cloud synchronization are deferred.
+is applied. Due Today uses explicitly saved scheduling values, so a new user's
+queue is empty. The repository accepts scheduling values for a future engine.
+Grammar and standalone kanji have models but no fabricated seed data or study
+UI. Audio controls and supplied-only parts of speech/examples/collocations/
+kanji breakdowns are absent when their data is unavailable. Accounts and cloud
+synchronization remain deferred.
+
+### UI verification captures
+
+The full local navigation widget test runs at 320px and 457px widths; existing
+responsive dashboard coverage also runs at 1100px. To render screenshots with
+the bundled Japanese and Material icon fonts in this cloud workspace:
+
+```sh
+flutter test test/study_ui_flow_test.dart --dart-define=TOMO_CAPTURE_UI=true
+```
+
+Captures go to `/workspace/tomo-tools/screenshots`, outside the repository.
+They show real N2 words and a test user who records one review, rather than
+illustrative dashboard values. This is a Flutter test-rendering check, not a
+mobile device test. See [verification details](docs/verification.md#tomo-v2-coral-ui-and-study-flow-verification).
+
+The Japanese variable font is from
+[Google Fonts Noto Sans JP](https://github.com/google/fonts/tree/main/ofl/notosansjp).
+Its SIL Open Font License is included at `assets/fonts/OFL.txt`.
 
 ## Storage boundaries
 

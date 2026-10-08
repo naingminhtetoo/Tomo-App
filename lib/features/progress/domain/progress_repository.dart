@@ -118,9 +118,24 @@ class DeckProgress {
   double get fraction => total == 0 ? 0 : learned / total;
 }
 
+class StudyActivity {
+  StudyActivity({
+    required this.days,
+    required this.reviewCounts,
+    required this.reviewed,
+    required this.correct,
+    required this.streak,
+  }) : assert(days.length == reviewCounts.length);
+  final List<DateTime> days;
+  final List<int> reviewCounts;
+  final int reviewed, correct, streak;
+  double get accuracy => reviewed == 0 ? 0 : correct / reviewed;
+}
+
 /// The single local-user-data boundary. Content JSON is never written here.
 abstract interface class ProgressRepository {
   Stream<void> get changes;
+  Future<StudyActivity> activity({DateTime? now, Set<String>? contentIds});
   Future<StudyProgress?> findByCardId(
     String id, {
     ContentType type = ContentType.vocabulary,

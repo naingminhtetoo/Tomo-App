@@ -2,48 +2,16 @@ import 'package:drift/native.dart';
 import 'package:tomo/core/database/app_database.dart';
 import 'package:tomo/features/progress/domain/progress_repository.dart';
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tomo/app/app.dart';
 import 'package:tomo/app/providers.dart';
 import 'package:tomo/app/router/app_router.dart';
-import 'package:tomo/core/storage/preferences_store.dart';
 import 'package:tomo/features/level_selection/data/app_preferences.dart';
 import 'package:tomo/features/settings/presentation/preferences_controller.dart';
-import 'package:tomo/features/level_selection/domain/jlpt_level.dart';
-import 'package:tomo/features/vocabulary/data/models/legacy_vocabulary_mapper.dart';
-import 'package:tomo/features/vocabulary/domain/entities/level_content.dart';
-import 'package:tomo/features/vocabulary/domain/repositories/vocabulary_repository.dart';
 
-class TestVocabularyRepository implements VocabularyRepository {
-  @override
-  Future<ContentSnapshot> loadLocal(JlptLevel level) async => ContentSnapshot(
-    content: const LegacyVocabularyMapper().decode(
-      File('assets/data/n2.json').readAsStringSync(),
-      expectedLevel: level,
-    ),
-    version: 1,
-    source: ContentSource.bundled,
-  );
-  @override
-  Future<ContentSnapshot?> checkForUpdate(
-    JlptLevel level, {
-    required int currentVersion,
-  }) async => null;
-}
-
-class MemoryPreferences implements PreferencesStore {
-  final values = <String, String>{};
-  @override
-  Future<String?> read(String key) async => values[key];
-  @override
-  Future<void> write(String key, String value) async {
-    values[key] = value;
-  }
-}
+import 'support/test_repositories.dart';
 
 void main() {
   test(
@@ -124,13 +92,14 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Japanese Study Companion'), findsOneWidget);
-      expect(find.text('JLPT Level: N2'), findsOneWidget);
+      expect(find.text('JLPT N2'), findsOneWidget);
       expect(tester.takeException(), isNull);
-      await tester.tap(find.text('Open study menu'));
+      await tester.tap(find.text('Start Studying'));
       await tester.pumpAndSettle();
-      expect(find.text('1591 cards'), findsOneWidget);
-      expect(find.text('134 cards'), findsOneWidget);
-      expect(find.text('87 cards'), findsOneWidget);
+      expect(find.text('Vocabulary'), findsWidgets);
+      expect(find.text('Kanji'), findsOneWidget);
+      expect(find.text('0 / 87 learned'), findsOneWidget);
+      expect(find.text('No content installed yet'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }
@@ -242,7 +211,7 @@ void main() {
       await tester.tap(find.text('Tap to reveal'));
       await tester.pumpAndSettle();
       expect(find.text('prohibition'), findsOneWidget);
-      await tester.tap(find.text('good'));
+      await tester.tap(find.text('Good'));
       await tester.pumpAndSettle();
       final repository = container.read(progressRepositoryProvider);
       final active = (await repository.loadActiveSession())!;
@@ -259,8 +228,8 @@ void main() {
       );
       router.go('/home');
       await tester.pumpAndSettle();
-      expect(find.text('Resume · card 2'), findsOneWidget);
-      await tester.tap(find.text('Resume · card 2'));
+      expect(find.text('Continue Session'), findsOneWidget);
+      await tester.tap(find.text('Continue Session'));
       await tester.pumpAndSettle();
       expect(find.textContaining('2 / '), findsOneWidget);
       expect(find.text('Tap to reveal'), findsOneWidget);

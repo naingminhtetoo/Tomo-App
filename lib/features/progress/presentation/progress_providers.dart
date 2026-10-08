@@ -4,6 +4,7 @@ import '../../../app/providers.dart';
 import '../../level_selection/domain/jlpt_level.dart';
 import '../../vocabulary/presentation/vocabulary_controller.dart';
 import '../domain/progress_repository.dart';
+import '../../settings/presentation/preferences_controller.dart';
 
 final progressChangesProvider = StreamProvider<int>((ref) async* {
   final repository = ref.watch(progressRepositoryProvider);
@@ -47,12 +48,14 @@ final chapterProgressProvider =
 
 class ReviewCollections {
   const ReviewCollections(
+    this.level,
     this.due,
     this.weak,
     this.favorites,
     this.recent,
     this.mistakes,
   );
+  final JlptLevel level;
   final List<StudyProgress> due, weak, favorites, recent, mistakes;
 }
 
@@ -61,11 +64,21 @@ final reviewCollectionsProvider = FutureProvider<ReviewCollections>((
 ) async {
   ref.watch(progressChangesProvider);
   final r = ref.watch(progressRepositoryProvider);
+  final level = (await ref.watch(preferencesControllerProvider.future)).level;
+  final content = (await ref.watch(levelContentProvider(level).future)).content;
+  List<StudyProgress> installed(List<StudyProgress> items) => items
+      .where(
+        (p) =>
+            p.contentType == ContentType.vocabulary &&
+            content.vocabulary.containsKey(p.contentId),
+      )
+      .toList();
   return ReviewCollections(
-    await r.getDueItems(),
-    await r.getWeakItems(),
-    await r.getFavorites(),
-    await r.getRecentlyLearned(),
-    await r.getCommonMistakes(),
+    level,
+    installed(await r.getDueItems()),
+    installed(await r.getWeakItems()),
+    installed(await r.getFavorites()),
+    installed(await r.getRecentlyLearned()),
+    installed(await r.getCommonMistakes()),
   );
 });

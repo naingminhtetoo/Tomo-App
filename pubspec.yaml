@@ -28,6 +28,10 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family: NotoSansJP
+      fonts:
+        - asset: assets/fonts/NotoSansJP.ttf
   assets:
     - assets/data/content-manifest.json
     - assets/data/n2.json

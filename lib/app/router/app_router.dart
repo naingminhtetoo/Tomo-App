@@ -2,7 +2,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/tomo_scaffold.dart';
-import '../../features/flashcards/presentation/deck_placeholder_screen.dart';
+import '../../features/flashcards/presentation/flashcard_screen.dart';
+import '../../features/flashcards/presentation/study_controller.dart';
+import '../../features/study_menu/domain/study_catalog.dart';
+import '../../features/study_menu/presentation/category_screen.dart';
+import '../../features/study_menu/presentation/chapter_screen.dart';
+import '../../features/vocabulary/presentation/word_detail_sheet.dart';
 import '../../features/level_selection/domain/jlpt_level.dart';
 import '../../features/level_selection/presentation/level_selection_screen.dart';
 import '../../features/progress/presentation/progress_screen.dart';
@@ -45,18 +50,98 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         ),
         routes: [
           GoRoute(
+            path: 'category/:kind',
+            name: AppRoutes.category,
+            redirect: (_, state) =>
+                StudyCategory.tryParse(state.pathParameters['kind']) == null
+                ? '/study/${state.pathParameters['level']}'
+                : null,
+            builder: (_, state) => CategoryScreen(
+              level: JlptLevel.tryParse(state.pathParameters['level'])!,
+              category: StudyCategory.tryParse(state.pathParameters['kind'])!,
+            ),
+            routes: [
+              GoRoute(
+                path: 'source/:source',
+                name: AppRoutes.chapters,
+                builder: (_, state) => ChapterScreen(
+                  level: JlptLevel.tryParse(state.pathParameters['level'])!,
+                  category: StudyCategory.tryParse(
+                    state.pathParameters['kind'],
+                  )!,
+                  source: state.pathParameters['source']!,
+                ),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'session',
+            name: AppRoutes.session,
+            builder: (_, state) => FlashcardScreen(
+              request: studyRequest(
+                level: JlptLevel.tryParse(state.pathParameters['level'])!,
+                resume: true,
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'word/:id',
+            name: AppRoutes.word,
+            builder: (_, state) => WordDetailScreen(
+              level: JlptLevel.tryParse(state.pathParameters['level'])!,
+              id: state.pathParameters['id']!,
+            ),
+          ),
+          GoRoute(
+            path: 'practice/:id',
+            name: AppRoutes.practiceWord,
+            builder: (_, state) => FlashcardScreen(
+              request: studyRequest(
+                level: JlptLevel.tryParse(state.pathParameters['level'])!,
+                contentId: state.pathParameters['id']!,
+                autoStart: true,
+              ),
+            ),
+          ),
+          GoRoute(
+            path: 'review/:filter',
+            name: AppRoutes.reviewStudy,
+            redirect: (_, state) =>
+                [
+                  'due',
+                  'weak',
+                  'favorites',
+                  'recent',
+                  'mistakes',
+                ].contains(state.pathParameters['filter'])
+                ? null
+                : '/review',
+            builder: (_, state) => FlashcardScreen(
+              request: studyRequest(
+                level: JlptLevel.tryParse(state.pathParameters['level'])!,
+                reviewFilter: state.pathParameters['filter'],
+                autoStart: true,
+              ),
+            ),
+          ),
+
+          GoRoute(
             path: 'deck/:category',
             name: AppRoutes.deck,
             redirect: (_, state) =>
                 DeckCategory.tryParse(state.pathParameters['category']) == null
                 ? '/levels'
                 : null,
-            builder: (_, state) => DeckPlaceholderScreen(
-              deckId: state.uri.queryParameters['deck'],
-              level: JlptLevel.tryParse(state.pathParameters['level'])!,
-              category: DeckCategory.tryParse(
-                state.pathParameters['category'],
-              )!,
+            builder: (_, state) => FlashcardScreen(
+              request: studyRequest(
+                deckId: state.uri.queryParameters['deck'],
+                source: state.uri.queryParameters['source'],
+                autoStart: state.uri.queryParameters['start'] == '1',
+                level: JlptLevel.tryParse(state.pathParameters['level'])!,
+                category: DeckCategory.tryParse(
+                  state.pathParameters['category'],
+                )!,
+              ),
             ),
           ),
         ],
