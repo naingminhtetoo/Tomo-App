@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Noto+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#12131a;color:#e3e1ec;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "surface": "#12131a", "tertiary-container": "#5e90f2", "error": "#ffb4ab", "surface-variant": "#34343c", "on-background": "#e3e1ec", "surface-container-high": "#292931", "surface-container-lowest": "#0d0e15", "surface-bright": "#383941", "inverse-primary": "#ae311e", "secondary-fixed-dim": "#fabc4d", "surface-container-highest": "#34343c", "error-container": "#93000a", "surface-tint": "#ffb4a6", "on-error-container": "#ffdad6", "on-surface": "#e3e1ec", "on-tertiary": "#002e6b", "on-tertiary-fixed-variant": "#004397", "on-secondary-fixed-variant": "#604100", "primary": "#ffb4a6", "on-primary": "#660600", "surface-dim": "#12131a", "tertiary": "#aec6ff", "tertiary-fixed-dim": "#aec6ff", "on-secondary-container": "#3a2600", "on-primary-fixed": "#3f0200", "on-primary-container": "#5c0500", "secondary": "#fabc4d", "on-secondary": "#432c00", "on-error": "#690005", "primary-fixed-dim": "#ffb4a6", "secondary-container": "#bd8718", "inverse-on-surface": "#2f3038", "inverse-surface": "#e3e1ec", "on-primary-fixed-variant": "#8c1808", "on-surface-variant": "#e1bfb9", "on-tertiary-fixed": "#001a43", "on-secondary-fixed": "#281900", "outline": "#a88a84", "secondary-fixed": "#ffdead", "background": "#12131a", "on-tertiary-container": "#002861", "primary-container": "#f4634b", "tertiary-fixed": "#d8e2ff", "outline-variant": "#59413d", "surface-container": "#1e1f26", "surface-container-low": "#1a1b22", "primary-fixed": "#ffdad4" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-md": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "margin": "1.25rem", "margin-tablet": "2rem", "gutter-tablet": "1.5rem", "space-xl": "2rem", "space-lg": "1.5rem", "gutter": "1rem" }, "fontFamily": { "body-md": ["Noto Sans"], "headline-md": ["Inter"], "headline-xl-mobile": ["Inter"], "label-md": ["Inter"], "headline-lg": ["Inter"], "kanji-hero": ["Noto Sans"], "kanji-card": ["Noto Sans"], "body-lg": ["Noto Sans"], "headline-xl": ["Inter"], "furigana": ["Noto Sans"], "label-sm": ["Inter"], "body-sm": ["Noto Sans"] }, "fontSize": { "body-md": ["15px", { "lineHeight": "22px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-xl-mobile": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }], "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "kanji-hero": ["64px", { "lineHeight": "72px", "fontWeight": "500" }], "kanji-card": ["36px", { "lineHeight": "44px", "fontWeight": "500" }], "body-lg": ["17px", { "lineHeight": "26px", "fontWeight": "400" }], "headline-xl": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "furigana": ["10px", { "lineHeight": "12px", "fontWeight": "500" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "18px", "fontWeight": "400" }] } } } };</script></head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_12px_rgba(0,0,0,0.25)]"><div class="h-16 px-margin flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="Tomo App Icon" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1X53tT0JjzTKuDVb6FLc8Ta8_KA34OaLl8o60uQlAUySNkGqdsbADTXo6qgE09oqWvB3e5kFXyb9BS1HLIoQWlqijI_85eKuzL0xjH89LoNr2XsiMTThgF7Fqs-RHby4ct1kjbTUr5Og_DgPOwcuQhU3mFPwXOgJIxYyfi2-9ugH13DNix9o6Y6MQvZyo3cimynvy-Mlc-B-wKoSDPjW0tjHUZlHi6xtEYwl5qwEHReo_myDNlSDV-bNUs"/><div class="flex flex-col justify-center leading-tight"><div class="flex items-baseline gap-1.5"><span class="font-headline-md text-headline-md tracking-tight text-on-surface">Tomo</span><span class="font-furigana text-furigana text-primary font-bold">友</span></div><span class="font-label-sm text-label-sm text-outline tracking-wider uppercase">Study</span></div></div><div class="flex items-center gap-space-sm"><span class="px-2 py-0.5 rounded-full font-label-sm text-label-sm bg-primary-container/20 text-primary border border-primary/20">JLPT N3</span><a class="relative w-11 h-11 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors" data-path="settings" href="#"><img alt="Profile" class="w-8 h-8 rounded-full object-cover ring-1 ring-outline/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMI1Nvk7E8cFMwWCBIEu40GNYlduqYnNgsUUcAHNVs_7hSU-2SjSXqO_YU8v_FAqxvIN7g70uYjCffPzsgTsipka21S_m3EfnmkpXw1Gj_BAu6gU6iCjvFObwPnUMF254SuvopzGZm3obOOnCYKRPjJfXFNJXg9CzBRDqGEGmmxjUpAMk7YXNEF2vF_DaKM5BxXEcJ3zcSbqFLaQJsSc7d-aWvq90dIyCVtSQUAs0Bi5DP8H3oXhtt"/></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface px-margin"><div class="flex flex-col w-full pb-8">
+<div class="relative w-full rounded-2xl bg-surface-container p-margin overflow-hidden mb-space-lg shadow-sm">
+<div class="absolute -right-8 -top-8 w-40 h-40 rounded-full bg-primary-container/10 blur-2xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<a class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full bg-surface-container-high text-primary hover:bg-surface-bright transition-colors" data-path="study" href="#">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span class="font-label-sm text-label-sm">Decks</span>
+</a>
+<span class="px-2.5 py-0.5 rounded-full font-label-sm text-label-sm bg-primary/15 text-primary font-medium tracking-wide">
+          Intermediate
+        </span>
+</div>
+<div class="pt-1">
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">JLPT N3 — Essential Vocabulary</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Core expressions for work, daily life, and exams</p>
+</div>
+<div class="mt-2 pt-3 flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">verified</span>
+<span class="font-label-md text-label-md text-on-surface">8 of 12 Chapters Mastered</span>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold">66%</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full rounded-full bg-gradient-to-r from-primary to-primary-container transition-all duration-700 ease-out" style="width: 66.6%;"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between mb-space-md px-1">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-on-surface">Course Roadmap</span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant">12 Units</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">schedule</span>
+<span>~2.4 hrs left</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-md" id="chapter-list">
+<div class="group relative w-full rounded-2xl bg-surface-container p-margin shadow-sm transition-all hover:bg-surface-container-high">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3 min-w-0">
+<span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-surface-bright text-tertiary font-label-md text-label-md">01</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-furigana text-furigana text-tertiary font-medium">にちじょうせいかつ</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface truncate">Daily Life &amp; Routines</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant">
+<span class="font-kanji-card text-[15px] leading-tight text-on-surface-variant">日常生活</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">30 items</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">12 min</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-bright text-tertiary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm">100%</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">military_tech</span>
+<span>30/30 Mastered</span>
+</div>
+<button class="h-9 px-4 rounded-xl bg-surface-bright text-on-surface font-label-md text-label-md hover:bg-surface-variant active:scale-95 transition-all flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span>Review</span>
+</button>
+</div>
+</div>
+<div class="group relative w-full rounded-2xl bg-surface-container p-margin shadow-sm transition-all hover:bg-surface-container-high">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3 min-w-0">
+<span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-surface-bright text-tertiary font-label-md text-label-md">02</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-furigana text-furigana text-tertiary font-medium">しょくばとビジネス</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface truncate">Work &amp; Office</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant">
+<span class="font-kanji-card text-[15px] leading-tight text-on-surface-variant">職場とビジネス</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">30 items</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">14 min</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-bright text-tertiary">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm">Done</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-tertiary">auto_awesome</span>
+<span>30/30 Mastered</span>
+</div>
+<button class="h-9 px-4 rounded-xl bg-surface-bright text-on-surface font-label-md text-label-md hover:bg-surface-variant active:scale-95 transition-all flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">sync</span>
+<span>Review</span>
+</button>
+</div>
+</div>
+<div class="relative w-full rounded-2xl bg-surface-container-high p-margin shadow-md shadow-primary-container/10 overflow-hidden">
+<div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-primary-container"></div>
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3 min-w-0">
+<span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md font-bold shadow-sm">03</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-furigana text-furigana text-primary font-medium">こうつうとりょこう</span>
+<span class="inline-flex px-1.5 py-0.2 rounded bg-primary-container/20 text-primary font-label-sm text-[10px]">CURRENT</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface truncate">Travel &amp; Transport</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant">
+<span class="font-kanji-card text-[15px] leading-tight text-on-surface">交通と旅行</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">30 items</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">11 min</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-container/20 text-primary">
+<span class="material-symbols-outlined text-[15px] animate-pulse">timelapse</span>
+<span class="font-label-sm text-label-sm font-semibold">60%</span>
+</div>
+</div>
+<div class="mt-space-md flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Progress (18/30 Words)</span>
+<span class="text-primary font-medium">12 to go</span>
+</div>
+<div class="w-full h-2 rounded-full bg-surface-container-highest overflow-hidden">
+<div class="h-full rounded-full bg-primary-container transition-all duration-500 ease-out" style="width: 60%;"></div>
+</div>
+</div>
+<div class="mt-space-md pt-1 flex items-center justify-between">
+<span class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-secondary">local_fire_department</span>
+<span>Streak safe: 4 days</span>
+</span>
+<a class="h-10 px-5 rounded-xl bg-primary-container text-white font-label-md text-label-md hover:opacity-95 active:scale-95 transition-all shadow-md flex items-center gap-2" data-path="study" href="#">
+<span>Continue</span>
+<span class="material-symbols-outlined text-[18px]">play_arrow</span>
+</a>
+</div>
+</div>
+<div class="group relative w-full rounded-2xl bg-surface-container p-margin shadow-sm transition-all hover:bg-surface-container-high">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3 min-w-0">
+<span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-surface-bright text-on-surface-variant font-label-md text-label-md">04</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-furigana text-furigana text-on-surface-variant font-medium">しょくじとにほんりょうり</span>
+<span class="inline-flex px-1.5 py-0.2 rounded bg-secondary/15 text-secondary font-label-sm text-[10px]">NEXT UP</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface truncate">Dining &amp; Food Culture</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant">
+<span class="font-kanji-card text-[15px] leading-tight text-on-surface-variant">食事と日本料理</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">30 items</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">15 min</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-bright text-on-surface-variant">
+<span class="material-symbols-outlined text-[15px]">lock_open</span>
+<span class="font-label-sm text-label-sm">0/30</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">menu_book</span>
+<span>Ready to study</span>
+</div>
+<button class="h-9 px-4 rounded-xl bg-surface-bright text-on-surface font-label-md text-label-md hover:bg-primary hover:text-on-primary active:scale-95 transition-all flex items-center gap-1.5" type="button">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+<span>Start</span>
+</button>
+</div>
+</div>
+<div class="group relative w-full rounded-2xl bg-surface-container p-margin shadow-sm transition-all hover:bg-surface-container-high">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3 min-w-0">
+<span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-surface-bright text-on-surface-variant font-label-md text-label-md">05</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-furigana text-furigana text-on-surface-variant font-medium">かんじょうとせいかく</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-on-surface truncate">Emotions &amp; Character</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-on-surface-variant">
+<span class="font-kanji-card text-[15px] leading-tight text-on-surface-variant">感情と性格</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">30 items</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">13 min</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-bright text-on-surface-variant">
+<span class="material-symbols-outlined text-[15px]">lock_open</span>
+<span class="font-label-sm text-label-sm">Unlocked</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between">
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px]">hourglass_empty</span>
+<span>0/30 words</span>
+</div>
+<button class="h-9 px-4 rounded-xl bg-surface-bright text-on-surface-variant font-label-md text-label-md hover:bg-surface-variant hover:text-on-surface active:scale-95 transition-all flex items-center gap-1.5" type="button">
+<span>Start</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="relative w-full rounded-2xl bg-surface-container-low p-margin opacity-70 shadow-none">
+<div class="flex items-start justify-between gap-3">
+<div class="flex items-start gap-3 min-w-0">
+<span class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-surface-container text-outline font-label-md text-label-md">06</span>
+<div class="min-w-0">
+<div class="flex items-center gap-2">
+<span class="font-furigana text-furigana text-outline font-medium">ニュースとしゃかい</span>
+</div>
+<h2 class="font-headline-md text-headline-md text-outline truncate">News &amp; Society</h2>
+<div class="flex items-center gap-1.5 mt-0.5 text-outline">
+<span class="font-kanji-card text-[15px] leading-tight text-outline">ニュースと社会</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">30 items</span>
+<span class="text-[12px] opacity-40">•</span>
+<span class="font-label-sm text-label-sm">16 min</span>
+</div>
+</div>
+</div>
+<div class="flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-surface-container text-outline">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-outline font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[15px]">info</span>
+<span>Complete Chapter 4 to unlock</span>
+</div>
+<div class="h-8 px-3 rounded-lg bg-surface-container text-outline font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+<span>Locked</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-space-xl p-margin rounded-2xl bg-surface-container flex items-center justify-between gap-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-tertiary-container/20 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-[22px]">headphones</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Listening Audio Drills</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Native speaker audio for N3</p>
+</div>
+</div>
+<button class="h-9 px-3 rounded-xl bg-surface-bright text-tertiary font-label-sm text-label-sm hover:bg-surface-variant transition-colors flex items-center gap-1" type="button">
+<span>Play All</span>
+<span class="material-symbols-outlined text-[16px]">play_arrow</span>
+</button>
+</div>
+</div>
+<script>
+  // Simple micro-haptic simulation and card expansion listener
+  document.querySelectorAll('#chapter-list button, #chapter-list a').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      // Gentle active feedback on tap
+      btn.style.transform = 'scale(0.96)';
+      setTimeout(() => {
+        btn.style.transform = '';
+      }, 120);
+    });
+  });
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface-container/90 backdrop-blur-xl rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.35)]" data-active-classes="text-primary-container [&amp;&gt;div]:bg-primary-container/15 [&amp;&gt;div]:text-primary-container"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[48px] text-on-surface-variant hover:text-on-surface transition-all" data-path="home" href="#"><div class="flex items-center justify-center w-11 h-7 rounded-full transition-colors"><span class="material-symbols-outlined text-[22px]">home</span></div><span class="font-label-sm text-label-sm">Home</span></a><a aria-current="page" class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[48px] transition-all text-primary-container [&amp;&gt;div]:bg-primary-container/15 [&amp;&gt;div]:text-primary-container" data-path="study" href="#"><div class="flex items-center justify-center w-11 h-7 rounded-full transition-colors"><span class="material-symbols-outlined text-[22px]">menu_book</span></div><span class="font-label-sm text-label-sm">Study</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[48px] text-on-surface-variant hover:text-on-surface transition-all" data-path="review" href="#"><div class="relative flex items-center justify-center w-11 h-7 rounded-full transition-colors"><span class="material-symbols-outlined text-[22px]">sync</span><span class="absolute top-0.5 right-2 w-2 h-2 rounded-full bg-primary-container ring-2 ring-surface-container"></span></div><span class="font-label-sm text-label-sm">Review</span></a><a class="flex flex-col items-center justify-center gap-1 min-w-[56px] min-h-[48px] text-on-surface-variant hover:text-on-surface transition-all" data-path="progress" href="#"><div class="flex items-center justify-center w-11 h-7 rounded-full transition-colors"><span class="material-symbols-outlined text-[22px]">trending_up</span></div><span class="font-label-sm text-label-sm">Progress</span></a></div></nav></body></html>
