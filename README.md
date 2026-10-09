@@ -6,7 +6,7 @@ on `main`; this work does not merge into or modify it.
 
 ## Run and verify
 
-Use Flutter stable (verified here with Flutter 3.47.6 / Dart 3.13.5):
+Use Flutter stable (latest UI work verified with Flutter 3.47.7 / Dart 3.13.5):
 
 ```sh
 flutter pub get
@@ -101,7 +101,8 @@ the bundled Japanese and Material icon fonts in this cloud workspace:
 flutter test test/study_ui_flow_test.dart --dart-define=TOMO_CAPTURE_UI=true
 ```
 
-Captures go to `/workspace/tomo-tools/screenshots`, outside the repository.
+Captures go to the platform temporary directory under
+`tomo-ui-screenshots`, outside the repository.
 They show real N2 words and a test user who records one review, rather than
 illustrative dashboard values. This is a Flutter test-rendering check, not a
 mobile device test. See [verification details](docs/verification.md#tomo-v2-coral-ui-and-study-flow-verification).
@@ -251,9 +252,10 @@ Sync-status fields provide a future boundary without implementing Supabase.
 
 ## Verification and next work
 
-See the [Phase 2 review and device checklist](docs/phase2-audit.md), and
+See the [Stitch UI implementation report](docs/phase2-stitch-implementation.md),
+the [Phase 2 review and device checklist](docs/phase2-audit.md), and
 [verification results](docs/verification.md) for commands and their actual
-outcomes, and [the original product audit](docs/legacy-product-audit.md) for the
+outcomes. The [original product audit](docs/legacy-product-audit.md) records the
 preserved Ionic behavior. The next task should define simple review scheduling
 and mastery rules, then add authored grammar/kanji content and publish a
 versioned manifest with permanent IDs. Device/iOS testing and release signing

@@ -163,12 +163,10 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byType(Switch));
+    final themeSwitch = find.byKey(const Key('theme-switch'));
+    await tester.tap(themeSwitch);
     await tester.pumpAndSettle();
-    expect(
-      Theme.of(tester.element(find.byType(Switch))).brightness,
-      Brightness.light,
-    );
+    expect(Theme.of(tester.element(themeSwitch)).brightness, Brightness.light);
     expect(find.text('Settings'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

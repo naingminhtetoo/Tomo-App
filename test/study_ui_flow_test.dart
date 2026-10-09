@@ -11,6 +11,8 @@ import 'package:tomo/app/providers.dart';
 import 'package:tomo/app/router/app_router.dart';
 import 'package:tomo/core/database/app_database.dart';
 import 'package:tomo/features/level_selection/data/app_preferences.dart';
+import 'package:tomo/features/level_selection/domain/jlpt_level.dart';
+import 'package:tomo/features/level_selection/presentation/level_catalog_controller.dart';
 import 'package:tomo/features/progress/presentation/progress_providers.dart';
 import 'package:tomo/features/vocabulary/presentation/word_detail_sheet.dart';
 import 'support/test_repositories.dart';
@@ -40,6 +42,7 @@ void main() {
             vocabularyRepositoryProvider.overrideWithValue(
               TestVocabularyRepository(),
             ),
+            levelCatalogProvider.overrideWith((ref) async => {JlptLevel.n2}),
             preferencesRepositoryProvider.overrideWithValue(
               AppPreferencesRepository(MemoryPreferences()),
             ),
@@ -68,7 +71,9 @@ void main() {
             final bytes = await image.toByteData(
               format: ui.ImageByteFormat.png,
             );
-            final file = File('/workspace/tomo-tools/screenshots/$name.png');
+            final file = File(
+              '${Directory.systemTemp.path}/tomo-ui-screenshots/$name.png',
+            );
             await file.parent.create(recursive: true);
             await file.writeAsBytes(bytes!.buffer.asUint8List());
             image.dispose();
@@ -147,6 +152,10 @@ void main() {
         await tester.pumpAndSettle();
         expect(find.text('Your Progress'), findsOneWidget);
         await shot('progress');
+        router.go('/settings');
+        await tester.pumpAndSettle();
+        expect(find.text('Study preferences'), findsOneWidget);
+        await shot('settings');
         router.go('/study/n2/category/grammar');
         await tester.pumpAndSettle();
         expect(find.text('No grammar content installed yet.'), findsOneWidget);
