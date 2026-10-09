@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/router/app_routes.dart';
+import '../../../app/theme/tomo_theme.dart';
+import '../../../core/widgets/tomo_components.dart';
 import '../../../core/widgets/tomo_scaffold.dart';
 import '../../level_selection/domain/jlpt_level.dart';
 import 'progress_providers.dart';
@@ -14,7 +16,9 @@ class ReviewScreen extends ConsumerWidget {
     return TomoScaffold(
       title: 'Daily Review',
       brandHeader: true,
+      sectionLabel: 'Review',
       levelLabel: data.value?.level.label,
+      maxContentWidth: 640,
       child: data.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, _) =>
@@ -22,25 +26,28 @@ class ReviewScreen extends ConsumerWidget {
         data: (data) => Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            const TomoSectionLabel('Review queue'),
+            const SizedBox(height: 6),
             Text(
               'Daily Review',
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             const SizedBox(height: 6),
-            const Text('Your local review queue & smart decks'),
+            Text(
+              'Saved learning history and smart collections',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
             const SizedBox(height: 28),
             SurfacePanel(
               accent: true,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Align(
+                  const Align(
                     alignment: Alignment.centerLeft,
-                    child: Icon(
-                      Icons.update,
-                      size: 42,
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
+                    child: TomoIconTile(Icons.update, size: 48),
                   ),
                   const SizedBox(height: 22),
                   Text(
@@ -51,7 +58,7 @@ class ReviewScreen extends ConsumerWidget {
                   Text(
                     data.due.isEmpty
                         ? 'Your queue is clear. Study a chapter or revisit a saved collection.'
-                        : 'Revisit scheduled words and record how well you remember them.',
+                        : 'Revisit words with a saved due date and record how well you remember them.',
                   ),
                   const SizedBox(height: 24),
                   FilledButton.icon(
@@ -65,7 +72,7 @@ class ReviewScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 28),
-            const SectionHeading('Smart Filter Decks'),
+            const SectionHeading('Smart Collections'),
             _collection(
               context,
               data.level,
@@ -111,7 +118,7 @@ class ReviewScreen extends ConsumerWidget {
                   SizedBox(width: 14),
                   Expanded(
                     child: Text(
-                      'Build a daily rhythm\nA short review gives you another chance to recall words. Each rating is saved locally.',
+                      'Build a daily rhythm\nA short review gives you another chance to recall words. Ratings are saved locally without automatic scheduling.',
                     ),
                   ),
                 ],
@@ -142,7 +149,14 @@ class ReviewScreen extends ConsumerWidget {
       padding: 8,
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        leading: Icon(icon, color: Theme.of(context).colorScheme.primary),
+        leading: TomoIconTile(
+          icon,
+          color: filter == 'weak'
+              ? Theme.of(context).colorScheme.error
+              : filter == 'recent'
+              ? TomoColors.blue
+              : Theme.of(context).colorScheme.primary,
+        ),
         title: Text(title, style: Theme.of(context).textTheme.titleLarge),
         subtitle: Text('$count words · $description'),
         trailing: const Icon(Icons.chevron_right),

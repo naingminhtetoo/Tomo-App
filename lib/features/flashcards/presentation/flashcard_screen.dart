@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../app/router/app_routes.dart';
+import '../../../app/theme/tomo_theme.dart';
 import '../../../core/widgets/tomo_scaffold.dart';
 import '../../../core/widgets/ui_action.dart';
 import '../../progress/domain/progress_repository.dart';
@@ -15,6 +17,7 @@ class FlashcardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) => TomoScaffold(
     title: 'Flashcard Session',
     showNavigation: false,
+    maxContentWidth: 560,
     actions: [
       IconButton(
         tooltip: 'Session settings',
@@ -40,12 +43,7 @@ class FlashcardScreen extends ConsumerWidget {
               ],
             ),
           ),
-          data: (view) => Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 560),
-              child: _body(context, ref, view),
-            ),
-          ),
+          data: (view) => _body(context, ref, view),
         ),
   );
   Widget _body(BuildContext context, WidgetRef ref, StudyView view) {
@@ -162,7 +160,26 @@ class FlashcardScreen extends ConsumerWidget {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        const SizedBox(height: TomoSpacing.md),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Card ${view.index + 1} / ${view.ids.length}',
+                style: theme.textTheme.labelLarge,
+              ),
+            ),
+            Text(
+              '${(((view.index + 1) / view.ids.length) * 100).round()}%',
+              style: theme.textTheme.labelLarge?.copyWith(
+                color: scheme.primary,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: TomoSpacing.sm),
+        LinearProgressIndicator(value: (view.index + 1) / view.ids.length),
+        const SizedBox(height: TomoSpacing.lg),
         if (view.conflict != null) ...[
           SurfacePanel(
             padding: 16,
@@ -188,7 +205,7 @@ class FlashcardScreen extends ConsumerWidget {
             label:
                 'Flashcard ${card.word}. ${view.flipped ? 'Hide meaning' : 'Reveal meaning'}',
             child: InkWell(
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(TomoRadii.card),
               onTap: view.busy ? null : controller.flip,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
@@ -196,16 +213,24 @@ class FlashcardScreen extends ConsumerWidget {
                   children: [
                     Row(
                       children: [
-                        if (card.partOfSpeech.isNotEmpty) ...[
-                          Flexible(
-                            child: TomoBadge(
-                              card.partOfSpeech.join(' · ').toUpperCase(),
-                            ),
+                        Expanded(
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              const TomoBadge('VOCABULARY DRILL'),
+                              if (card.partOfSpeech.isNotEmpty)
+                                TomoBadge(
+                                  card.partOfSpeech.join(' · ').toUpperCase(),
+                                ),
+                              TomoBadge(
+                                'JLPT ${card.level.label}',
+                                accent: false,
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                        ],
-                        TomoBadge('JLPT ${card.level.label}', accent: false),
-                        const Spacer(),
+                        ),
+                        const SizedBox(width: 8),
                         IconButton(
                           tooltip: progress?.favorite == true
                               ? 'Remove favorite'
@@ -256,9 +281,17 @@ class FlashcardScreen extends ConsumerWidget {
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 240),
                       child: view.flipped
-                          ? Padding(
+                          ? Container(
                               key: const ValueKey('answer'),
-                              padding: const EdgeInsets.only(top: 28),
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(top: 28),
+                              padding: const EdgeInsets.all(TomoSpacing.md),
+                              decoration: BoxDecoration(
+                                color: scheme.surfaceContainerHigh,
+                                borderRadius: BorderRadius.circular(
+                                  TomoRadii.control,
+                                ),
+                              ),
                               child: Text(
                                 card.meanings.join(' · '),
                                 textAlign: TextAlign.center,
@@ -296,26 +329,6 @@ class FlashcardScreen extends ConsumerWidget {
             ),
           ),
         ),
-        const SizedBox(height: 22),
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                'SESSION POSITION',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  color: scheme.onSurfaceVariant,
-                  letterSpacing: 0.7,
-                ),
-              ),
-            ),
-            Text(
-              '${view.index + 1} / ${view.ids.length}',
-              style: theme.textTheme.titleSmall,
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        LinearProgressIndicator(value: (view.index + 1) / view.ids.length),
         const SizedBox(height: 24),
         if (view.active == null)
           FilledButton(
@@ -400,6 +413,10 @@ class FlashcardScreen extends ConsumerWidget {
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 12),
+                        foregroundColor: _ratingColor(rating),
+                        side: BorderSide(
+                          color: _ratingColor(rating).withValues(alpha: 0.5),
+                        ),
                       ),
                       onPressed:
                           view.active == null || !view.flipped || view.busy
@@ -454,33 +471,43 @@ class FlashcardScreen extends ConsumerWidget {
     ReviewRating.good => 'Good',
     ReviewRating.easy => 'Easy',
   };
+
+  Color _ratingColor(ReviewRating rating) => switch (rating) {
+    ReviewRating.again => TomoColors.error,
+    ReviewRating.hard => TomoColors.amber,
+    ReviewRating.good => TomoColors.blue,
+    ReviewRating.easy => TomoColors.success,
+  };
+
   void _settings(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Session settings',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Tap the card to reveal its meaning. Previous and Next change your saved position without recording a review.',
-            ),
-            const SizedBox(height: 12),
-            const Text(
-              'Again, Hard, Good and Easy save a review. Automatic interval scheduling and audio are not available yet.',
-            ),
-            const SizedBox(height: 20),
-            FilledButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Done'),
-            ),
-          ],
+      builder: (context) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(TomoSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Session settings',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Tap the card to reveal its meaning. Previous and Next change your saved position without recording a review.',
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Again, Hard, Good and Easy save a review. Automatic interval scheduling and audio are not available yet.',
+              ),
+              const SizedBox(height: 20),
+              FilledButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Done'),
+              ),
+            ],
+          ),
         ),
       ),
     );
