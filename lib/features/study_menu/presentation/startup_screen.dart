@@ -19,6 +19,7 @@ class StartupScreen extends ConsumerWidget {
     }
     return TomoScaffold(
       title: 'Tomo',
+      showNavigation: false,
       child: preferences.when(
         data: (_) => const LoadingStatus(),
         loading: () => const LoadingStatus(),

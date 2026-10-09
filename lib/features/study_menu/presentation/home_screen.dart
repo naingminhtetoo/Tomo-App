@@ -42,7 +42,7 @@ class HomeScreen extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: () => context.pushNamed(AppRoutes.levels),
                   icon: const Icon(Icons.circle, size: 9),
-                  label: Text('JLPT ${settings.level.label}'),
+                  label: const Text('Change level'),
                 ),
                 ref
                     .watch(studyActivityProvider(settings.level))

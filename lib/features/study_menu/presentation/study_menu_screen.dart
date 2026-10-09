@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../app/router/app_routes.dart';
+import '../../../app/theme/tomo_theme.dart';
 import '../../../core/widgets/tomo_scaffold.dart';
 import '../../../core/widgets/async_status.dart';
 import '../../level_selection/domain/jlpt_level.dart';
@@ -31,6 +32,7 @@ class _StudyMenuState extends ConsumerState<StudyMenuScreen> {
   Widget build(BuildContext context) => TomoScaffold(
     title: 'Study',
     brandHeader: true,
+    sectionLabel: 'STUDY',
     levelLabel: widget.level.label,
     child: ref
         .watch(studyCatalogProvider(widget.level))
@@ -106,7 +108,7 @@ class _StudyMenuState extends ConsumerState<StudyMenuScreen> {
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Card(
                       child: InkWell(
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(TomoRadii.card),
                         onTap: () => context.pushNamed(
                           AppRoutes.category,
                           pathParameters: {
