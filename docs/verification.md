@@ -1,5 +1,8 @@
 # Phase 1 verification
 
+> For the latest Phase 2 UX verification, see
+> [Phase 2 UX refinement](phase2-ux-refinement.md#verification).
+
 Verified with Flutter 3.47.6 / Dart 3.13.5 on macOS arm64.
 Commands ran at the repository root, using the temporary SDK at
 `/tmp/tomo-flutter-sdk/bin`. Flutter commands used `--no-version-check` to avoid

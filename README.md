@@ -54,42 +54,51 @@ The app now uses the official Stitch coral design: centralized dark/light
 ThemeData, rounded bordered cards, coral buttons and navigation, and bundled
 Noto Sans JP typography. The dashboard restores the selected level and shows
 real daily reviews, learned words, accuracy, streak, due count and category
-progress. Continue Session restores the exact saved card order and position.
+progress. Its level control is labeled `JLPT N2 · Change Level`. Continue
+Learning restores the last browsed chapter, while Resume Flashcards
+independently restores an unfinished card session and its exact position.
 
-Normal navigation is Home → Study → Category → Source → Chapter → Flashcards
-→ Word Detail. Sources with one deck open it directly. N2 is the only supplied
-level; empty Grammar content is identified clearly. The legacy Kanji sources
-are vocabulary collections and are labeled accordingly. Vocabulary and Kanji
-views share those source memberships, so their totals overlap intentionally.
-Category/source/chapter totals count unique master IDs, rather than duplicated
-legacy occurrences.
+Normal learning navigation is Home → Study → Category → Source → Chapter →
+Learning List → Word Detail. A chapter opens a searchable reading list first;
+Practice Flashcards is an explicit secondary action. Sources with one deck
+open their list directly. N2 is the only supplied level; empty Grammar content
+is identified clearly. The legacy Kanji sources are vocabulary collections
+and are labeled accordingly. Vocabulary and Kanji views share those source
+memberships, so their totals overlap intentionally. Category/source/chapter
+totals count unique master IDs, rather than duplicated legacy occurrences.
 
 Study has local Japanese/reading/English search. The Riverpod study controller
-owns reveal, previous/next, explicit shuffle, flags, session start/end and
-review recording. Navigation saves position without recording a review;
-ratings require a revealed answer and atomically record history plus advance
-the saved session. Shuffle restarts at the first card after an in-app
-confirmation; after resume, turning it off restores source/collection order
-without changing saved session membership; unfinished sessions require confirmation before replacement.
-Word Detail reuses the existing component and hides absent metadata.
+now exposes two explicit modes. Learn Mode shows the meaning by default,
+supports hide/show plus previous/next, and never writes review history. Review
+Mode starts hidden; reveal enables Again/Hard/Good/Easy and each rating
+atomically records history and advances the saved session. The controller also
+owns explicit shuffle, flags, session start/end and conflict handling. Shuffle
+restarts at the first card after an in-app confirmation; after resume, turning
+it off restores source/collection order without changing saved session
+membership. Word Detail reuses the existing component and hides absent
+metadata.
 
 Review opens real Due Today, Weak Words, Favorites, Recently Learned and
 Common Mistakes collections, filtered to installed vocabulary at the selected
 level. Weak words include difficult flags, the latest Hard/Again rating and
 repeated incorrect reviews. Recent words are ordered by first studied date;
 common mistakes contain recorded incorrect reviews. Progress shows unique
-studied words by category/chapter, lifetime accuracy and seven calendar days
-of review activity. Accuracy follows the existing repository convention:
+studied words by level/category/source/chapter, lifetime accuracy and seven
+calendar days of review activity. Every chapter row opens its Learning List.
+Accuracy follows the existing repository convention:
 Hard/Good/Easy count as correct, Again as incorrect. A streak includes today
 or, before today's first review, yesterday.
 
 Ratings record history/counts; no automatic interval, ease or mastery algorithm
 is applied. Due Today uses explicitly saved scheduling values, so a new user's
 queue is empty. The repository accepts scheduling values for a future engine.
-Grammar and standalone kanji have models but no fabricated seed data or study
-UI. Audio controls and supplied-only parts of speech/examples/collocations/
-kanji breakdowns are absent when their data is unavailable. Accounts and cloud
-synchronization remain deferred.
+Grammar and standalone kanji have prepared native layouts for readings,
+meanings, usage, examples, stroke counts and related vocabulary when those
+fields exist. The current N2 bundle supplies neither standalone kanji nor
+grammar records, so the app explains the limitation without fabricating
+lessons. Audio controls and supplied-only parts of speech/examples/
+collocations/kanji breakdowns are absent when their data is unavailable.
+Accounts and cloud synchronization remain deferred.
 
 ### UI verification captures
 
@@ -117,7 +126,7 @@ Its SIL Open Font License is included at `assets/fonts/OFL.txt`.
 | --- | --- |
 | Shared words, kanji, grammar, meanings, examples and deck membership | JSON assets and validated file cache |
 | User progress, favorites, difficult flags, review history and sessions | Drift / SQLite |
-| Selected level, theme and default shuffle | SharedPreferences |
+| Selected level, theme, default shuffle and last browsed chapter | SharedPreferences |
 | Future account, backup and multi-device synchronization | Supabase, not implemented or installed |
 
 Widgets consume Riverpod providers; repositories own content and user-data
@@ -252,7 +261,8 @@ Sync-status fields provide a future boundary without implementing Supabase.
 
 ## Verification and next work
 
-See the [Stitch UI implementation report](docs/phase2-stitch-implementation.md),
+See the [Phase 2 UX refinement report](docs/phase2-ux-refinement.md),
+the [Stitch UI implementation report](docs/phase2-stitch-implementation.md),
 the [Phase 2 review and device checklist](docs/phase2-audit.md), and
 [verification results](docs/verification.md) for commands and their actual
 outcomes. The [original product audit](docs/legacy-product-audit.md) records the
