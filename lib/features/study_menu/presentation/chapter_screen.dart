@@ -67,13 +67,6 @@ class ChapterScreen extends ConsumerWidget {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Chapter selection',
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(height: TomoSpacing.sm),
                 _CourseSummary(
                   level: level,
                   category: category,
@@ -81,30 +74,12 @@ class ChapterScreen extends ConsumerWidget {
                   chapterCount: selected.decks.length,
                   progress: progress,
                   onBack: () => context.pop(),
-                ),
-                const SizedBox(height: TomoSpacing.lg),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        'Course Roadmap',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    TomoBadge(
-                      '${selected.decks.length} ${selected.decks.length == 1 ? 'unit' : 'units'}',
-                      accent: false,
-                    ),
-                  ],
+                  onBrowseAll: () => _browse(context, 'all:$source'),
                 ),
                 const SizedBox(height: TomoSpacing.md),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () => _browse(context, 'all:$source'),
-                    icon: const Icon(Icons.view_list_outlined),
-                    label: const Text('Browse All Words'),
-                  ),
+                Text(
+                  'Course Roadmap',
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: TomoSpacing.md),
                 ...selected.decks.asMap().entries.map((entry) {
@@ -117,13 +92,14 @@ class ChapterScreen extends ConsumerWidget {
                               activeId != null &&
                               deck.contentIds.contains(activeId)));
                   return Padding(
-                    padding: const EdgeInsets.only(bottom: TomoSpacing.md),
-                    child: _ChapterCard(
+                    padding: const EdgeInsets.only(bottom: TomoSpacing.sm),
+                    child: CompactChapterRow(
+                      key: Key('chapter-row-${deck.id}'),
                       number: deck.chapter ?? entry.key + 1,
                       title: StudyCatalog.deckTitle(deck),
                       progress: chapterProgress,
                       current: current,
-                      onBrowse: () => _browse(context, deck.id),
+                      onTap: () => _browse(context, deck.id),
                     ),
                   );
                 }),
@@ -142,6 +118,7 @@ class _CourseSummary extends StatelessWidget {
     required this.chapterCount,
     required this.progress,
     required this.onBack,
+    required this.onBrowseAll,
   });
 
   final JlptLevel level;
@@ -149,23 +126,21 @@ class _CourseSummary extends StatelessWidget {
   final String title;
   final int chapterCount;
   final DeckProgress progress;
-  final VoidCallback onBack;
+  final VoidCallback onBack, onBrowseAll;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return SurfacePanel(
-      accent: true,
+      key: const Key('course-summary'),
+      padding: TomoSpacing.md,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            spacing: TomoSpacing.sm,
-            runSpacing: TomoSpacing.xs,
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          Row(
             children: [
               TextButton.icon(
+                key: const Key('back-to-decks'),
                 onPressed: onBack,
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
@@ -173,215 +148,156 @@ class _CourseSummary extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back, size: 18),
                 label: const Text('Decks'),
               ),
-              TomoBadge(category.label, accent: false),
-            ],
-          ),
-          const SizedBox(height: TomoSpacing.sm),
-          Text(
-            'JLPT ${level.label} — $title',
-            style: Theme.of(context).textTheme.headlineMedium,
-          ),
-          const SizedBox(height: TomoSpacing.sm),
-          Text(
-            '$chapterCount local ${chapterCount == 1 ? 'chapter' : 'chapters'} · ${progress.total} unique words',
-            style: TextStyle(color: scheme.onSurfaceVariant),
-          ),
-          const SizedBox(height: TomoSpacing.lg),
-          Row(
-            children: [
-              Icon(Icons.verified_outlined, color: scheme.secondary, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  '${progress.learned} of ${progress.total} words studied',
-                  style: Theme.of(context).textTheme.labelLarge,
+              const Spacer(),
+              Tooltip(
+                message: 'Browse all words in this course',
+                child: IconButton(
+                  key: const Key('browse-all-words'),
+                  onPressed: onBrowseAll,
+                  color: scheme.onSurfaceVariant,
+                  icon: const Icon(Icons.view_list_outlined, size: 20),
                 ),
               ),
-              Text(
-                '${(progress.fraction * 100).round()}%',
-                style: Theme.of(
-                  context,
-                ).textTheme.labelLarge?.copyWith(color: scheme.primary),
-              ),
             ],
           ),
-          const SizedBox(height: 10),
-          LinearProgressIndicator(value: progress.fraction),
+          const SizedBox(height: TomoSpacing.xs),
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: TomoSpacing.xs),
+          Text(
+            '${category.label} · JLPT ${level.label}',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '$chapterCount ${chapterCount == 1 ? 'chapter' : 'chapters'} · ${progress.total} items',
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: scheme.onSurfaceVariant),
+          ),
         ],
       ),
     );
   }
 }
 
-class _ChapterCard extends StatelessWidget {
-  const _ChapterCard({
+/// A dense chapter target that keeps the full row interactive.
+///
+/// It is public so the responsive layout can be exercised with long localized
+/// titles independently of the installed content catalog.
+class CompactChapterRow extends StatelessWidget {
+  const CompactChapterRow({
+    super.key,
     required this.number,
     required this.title,
     required this.progress,
     required this.current,
-    required this.onBrowse,
+    required this.onTap,
   });
 
   final int number;
   final String title;
   final DeckProgress progress;
   final bool current;
-  final VoidCallback onBrowse;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final complete = progress.total > 0 && progress.learned == progress.total;
-    final started = progress.learned > 0;
-    final status = current
-        ? 'CURRENT'
-        : complete
-        ? 'STUDIED'
-        : started
-        ? 'IN PROGRESS'
-        : 'READY';
-    final statusColor = current
-        ? scheme.primary
-        : complete
-        ? TomoColors.blue
-        : started
-        ? TomoColors.amber
-        : scheme.onSurfaceVariant;
+    final enabled = progress.total > 0;
+    final status = enabled
+        ? '${progress.learned} / ${progress.total} learned${current ? ' · Continue' : ''}'
+        : 'No items';
     return Card(
       color: current ? scheme.surfaceContainerHigh : null,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(TomoRadii.card),
-        onTap: progress.total == 0 ? null : onBrowse,
-        child: Stack(
-          children: [
-            if (current)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 4,
-                  decoration: const BoxDecoration(
-                    color: TomoColors.coral,
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(TomoRadii.card),
-                    ),
-                  ),
+      child: Semantics(
+        button: true,
+        enabled: enabled,
+        excludeSemantics: true,
+        label: 'Chapter ${number.toString().padLeft(2, '0')}, $title, $status',
+        child: InkWell(
+          borderRadius: BorderRadius.circular(TomoRadii.card),
+          onTap: enabled ? onTap : null,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 76),
+            child: Opacity(
+              opacity: enabled ? 1 : 0.55,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 10,
                 ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(TomoSpacing.md),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 34,
-                        height: 34,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: current
-                              ? scheme.primary
-                              : scheme.surfaceContainerHighest,
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(
-                          number.toString().padLeft(2, '0'),
-                          style: Theme.of(context).textTheme.labelMedium
-                              ?.copyWith(
-                                color: current ? scheme.onPrimary : null,
-                              ),
-                        ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: current
+                            ? scheme.primary
+                            : scheme.surfaceContainerHighest,
+                        shape: BoxShape.circle,
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleLarge,
+                      child: Text(
+                        number.toString().padLeft(2, '0'),
+                        style: Theme.of(context).textTheme.labelMedium
+                            ?.copyWith(
+                              color: current ? scheme.onPrimary : null,
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '${progress.total} words',
-                              style: TextStyle(color: scheme.onSurfaceVariant),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            status,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: current
+                                      ? scheme.primary
+                                      : scheme.onSurfaceVariant,
+                                ),
+                          ),
+                          if (enabled) ...[
+                            const SizedBox(height: 6),
+                            LinearProgressIndicator(
+                              value: progress.fraction,
+                              minHeight: 3,
                             ),
                           ],
-                        ),
+                        ],
                       ),
-                      const SizedBox(width: 8),
-                      TomoBadge(status, color: statusColor),
-                    ],
-                  ),
-                  const SizedBox(height: TomoSpacing.md),
-                  if (started || current) ...[
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${progress.learned}/${progress.total} studied',
-                            style: Theme.of(context).textTheme.labelMedium,
-                          ),
-                        ),
-                        Text(
-                          '${progress.total - progress.learned} to go',
-                          style: Theme.of(context).textTheme.labelSmall
-                              ?.copyWith(
-                                color: current
-                                    ? scheme.primary
-                                    : scheme.onSurfaceVariant,
-                              ),
-                        ),
-                      ],
                     ),
-                    const SizedBox(height: 8),
-                    LinearProgressIndicator(value: progress.fraction),
-                    const SizedBox(height: TomoSpacing.md),
+                    const SizedBox(width: 8),
+                    Icon(
+                      enabled ? Icons.chevron_right : Icons.lock_outline,
+                      color: current ? scheme.primary : scheme.onSurfaceVariant,
+                      size: 20,
+                    ),
                   ],
-                  Row(
-                    children: [
-                      Icon(
-                        complete
-                            ? Icons.verified_outlined
-                            : current
-                            ? Icons.local_fire_department_outlined
-                            : Icons.menu_book_outlined,
-                        color: statusColor,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 7),
-                      Expanded(
-                        child: Text(
-                          complete
-                              ? 'Ready to review'
-                              : current
-                              ? 'Saved session available'
-                              : 'Ready to study',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: scheme.onSurfaceVariant),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: TomoSpacing.sm),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: FilledButton.tonalIcon(
-                      onPressed: progress.total == 0 ? null : onBrowse,
-                      icon: const Icon(Icons.chevron_right),
-                      iconAlignment: IconAlignment.end,
-                      label: const Text('Browse Words'),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
