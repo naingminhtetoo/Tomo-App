@@ -33,6 +33,23 @@ final progressSummaryProvider =
             },
           );
     });
+
+final favoriteVocabularyIdsProvider =
+    FutureProvider.family<Set<String>, JlptLevel>((ref, level) async {
+      ref.watch(progressChangesProvider);
+      final content = (await ref.watch(
+        levelContentProvider(level).future,
+      )).content;
+      final favorites = await ref
+          .watch(progressRepositoryProvider)
+          .getFavorites();
+      return {
+        for (final item in favorites)
+          if (item.contentType == ContentType.vocabulary &&
+              content.vocabulary.containsKey(item.contentId))
+            item.contentId,
+      };
+    });
 final chapterProgressProvider =
     FutureProvider.family<DeckProgress, ({JlptLevel level, String deckId})>((
       ref,

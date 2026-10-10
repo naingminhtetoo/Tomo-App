@@ -7,6 +7,7 @@ import '../../features/flashcards/presentation/study_controller.dart';
 import '../../features/study_menu/domain/study_catalog.dart';
 import '../../features/study_menu/presentation/category_screen.dart';
 import '../../features/study_menu/presentation/chapter_screen.dart';
+import '../../features/study_menu/presentation/learning_list_screen.dart';
 import '../../features/vocabulary/presentation/word_detail_sheet.dart';
 import '../../features/level_selection/domain/jlpt_level.dart';
 import '../../features/level_selection/presentation/level_selection_screen.dart';
@@ -73,6 +74,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 ),
               ),
             ],
+          ),
+          GoRoute(
+            path: 'learn/:kind',
+            name: AppRoutes.learningList,
+            redirect: (_, state) =>
+                StudyCategory.tryParse(state.pathParameters['kind']) == null ||
+                    state.uri.queryParameters['source'] == null ||
+                    state.uri.queryParameters['deck'] == null
+                ? '/study/${state.pathParameters['level']}'
+                : null,
+            builder: (_, state) => LearningListScreen(
+              level: JlptLevel.tryParse(state.pathParameters['level'])!,
+              category: StudyCategory.tryParse(state.pathParameters['kind'])!,
+              source: state.uri.queryParameters['source']!,
+              deckId: state.uri.queryParameters['deck']!,
+            ),
           ),
           GoRoute(
             path: 'session',

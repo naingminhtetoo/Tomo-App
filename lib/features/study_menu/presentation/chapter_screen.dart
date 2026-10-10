@@ -10,8 +10,6 @@ import '../../../core/widgets/tomo_scaffold.dart';
 import '../../level_selection/domain/jlpt_level.dart';
 import '../../progress/domain/progress_repository.dart';
 import '../../progress/presentation/progress_providers.dart';
-import '../../vocabulary/domain/entities/deck_category.dart';
-import '../../vocabulary/domain/entities/study_deck.dart';
 import '../domain/study_catalog.dart';
 import 'catalog_provider.dart';
 
@@ -27,17 +25,11 @@ class ChapterScreen extends ConsumerWidget {
   final StudyCategory category;
   final String source;
 
-  void _study(BuildContext context, StudyDeck deck, String id) =>
-      context.pushNamed(
-        AppRoutes.deck,
-        pathParameters: {
-          'level': level.name,
-          'category':
-              (DeckCategory.tryParse(deck.category) ?? DeckCategory.other)
-                  .contentKey,
-        },
-        queryParameters: {'deck': id, 'source': source, 'start': '1'},
-      );
+  void _browse(BuildContext context, String deckId) => context.pushNamed(
+    AppRoutes.learningList,
+    pathParameters: {'level': level.name, 'kind': category.name},
+    queryParameters: {'deck': deckId, 'source': source},
+  );
 
   @override
   Widget build(BuildContext context, WidgetRef ref) => TomoScaffold(
@@ -109,10 +101,9 @@ class ChapterScreen extends ConsumerWidget {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton.icon(
-                    onPressed: () =>
-                        _study(context, selected.decks.first, 'all:$source'),
-                    icon: const Icon(Icons.play_arrow_rounded),
-                    label: const Text('Study All Chapters'),
+                    onPressed: () => _browse(context, 'all:$source'),
+                    icon: const Icon(Icons.view_list_outlined),
+                    label: const Text('Browse All Words'),
                   ),
                 ),
                 const SizedBox(height: TomoSpacing.md),
@@ -132,7 +123,7 @@ class ChapterScreen extends ConsumerWidget {
                       title: StudyCatalog.deckTitle(deck),
                       progress: chapterProgress,
                       current: current,
-                      onStudy: () => _study(context, deck, deck.id),
+                      onBrowse: () => _browse(context, deck.id),
                     ),
                   );
                 }),
@@ -228,14 +219,14 @@ class _ChapterCard extends StatelessWidget {
     required this.title,
     required this.progress,
     required this.current,
-    required this.onStudy,
+    required this.onBrowse,
   });
 
   final int number;
   final String title;
   final DeckProgress progress;
   final bool current;
-  final VoidCallback onStudy;
+  final VoidCallback onBrowse;
 
   @override
   Widget build(BuildContext context) {
@@ -260,7 +251,7 @@ class _ChapterCard extends StatelessWidget {
       color: current ? scheme.surfaceContainerHigh : null,
       child: InkWell(
         borderRadius: BorderRadius.circular(TomoRadii.card),
-        onTap: progress.total == 0 ? null : onStudy,
+        onTap: progress.total == 0 ? null : onBrowse,
         child: Stack(
           children: [
             if (current)
@@ -381,22 +372,10 @@ class _ChapterCard extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: FilledButton.tonalIcon(
-                      onPressed: progress.total == 0 ? null : onStudy,
-                      icon: Icon(
-                        current
-                            ? Icons.play_arrow_rounded
-                            : complete
-                            ? Icons.sync
-                            : Icons.chevron_right,
-                      ),
+                      onPressed: progress.total == 0 ? null : onBrowse,
+                      icon: const Icon(Icons.chevron_right),
                       iconAlignment: IconAlignment.end,
-                      label: Text(
-                        current
-                            ? 'Continue Chapter'
-                            : complete
-                            ? 'Review'
-                            : 'Start Chapter',
-                      ),
+                      label: const Text('Browse Words'),
                     ),
                   ),
                 ],

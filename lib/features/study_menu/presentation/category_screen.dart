@@ -6,7 +6,6 @@ import '../../../core/widgets/tomo_scaffold.dart';
 import '../../../core/widgets/async_status.dart';
 import '../../level_selection/domain/jlpt_level.dart';
 import '../domain/study_catalog.dart';
-import '../../vocabulary/domain/entities/deck_category.dart';
 import 'catalog_provider.dart';
 
 class CategoryScreen extends ConsumerWidget {
@@ -40,9 +39,13 @@ class CategoryScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                category == StudyCategory.kanji
-                    ? 'Kanji through the supplied vocabulary collections'
-                    : 'Choose a study source',
+                switch (category) {
+                  StudyCategory.kanji =>
+                    'Browse the kanji-related vocabulary supplied by each source',
+                  StudyCategory.grammar =>
+                    'Grammar patterns, explanations, and examples will appear when installed',
+                  _ => 'Choose a learning source',
+                },
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
@@ -58,8 +61,12 @@ class CategoryScreen extends ConsumerWidget {
                         'No ${category.label.toLowerCase()} content installed yet.',
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Available N2 vocabulary collections can be studied offline.',
+                      Text(
+                        category == StudyCategory.grammar
+                            ? 'No authored N2 grammar lessons are included yet.'
+                            : category == StudyCategory.kanji
+                            ? 'No standalone kanji lessons are included yet.'
+                            : 'Available N2 collections can be browsed offline.',
                       ),
                     ],
                   ),
@@ -101,18 +108,14 @@ class CategoryScreen extends ConsumerWidget {
                             if (source.decks.length == 1) {
                               final deck = source.decks.single;
                               context.pushNamed(
-                                AppRoutes.deck,
+                                AppRoutes.learningList,
                                 pathParameters: {
                                   'level': level.name,
-                                  'category':
-                                      (DeckCategory.tryParse(deck.category) ??
-                                              DeckCategory.other)
-                                          .contentKey,
+                                  'kind': category.name,
                                 },
                                 queryParameters: {
                                   'deck': deck.id,
                                   'source': source.id,
-                                  'start': '1',
                                 },
                               );
                               return;

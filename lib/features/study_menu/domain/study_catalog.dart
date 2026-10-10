@@ -44,8 +44,14 @@ class StudyCatalog {
             d.category != 'adverbs' &&
                 d.contentIds.any(content.vocabulary.containsKey),
           StudyCategory.kanji => ['kanji', 'kanji_master'].contains(d.category),
-          StudyCategory.grammar => d.category == 'grammar',
-          StudyCategory.adverbs => ['adverbs', 'adverb'].contains(d.category),
+          StudyCategory.grammar =>
+            d.category == 'grammar' &&
+                d.contentIds.any(
+                  (id) => content.grammar.any((g) => g.id == id),
+                ),
+          StudyCategory.adverbs =>
+            ['adverbs', 'adverb'].contains(d.category) &&
+                d.contentIds.any(content.vocabulary.containsKey),
         },
       )
       .toList();
@@ -73,6 +79,17 @@ class StudyCatalog {
       .toSet();
   static String sourceTitle(String id) =>
       DeckCategory.tryParse(id)?.label ?? id;
+  static StudyCategory categoryForDeck(StudyDeck deck) =>
+      switch (DeckCategory.tryParse(deck.category) ?? DeckCategory.other) {
+        DeckCategory.kanji || DeckCategory.kanjiMaster => StudyCategory.kanji,
+        DeckCategory.vocabularyShinkanzen ||
+        DeckCategory.vocabularySoumatome => StudyCategory.vocabulary,
+        DeckCategory.adverb => StudyCategory.adverbs,
+        DeckCategory.other =>
+          deck.category == 'grammar'
+              ? StudyCategory.grammar
+              : StudyCategory.vocabulary,
+      };
   static String deckTitle(StudyDeck deck) => deck.title.trim().isEmpty
       ? 'All ${sourceTitle(deck.source ?? deck.category)}'
       : deck.title;
