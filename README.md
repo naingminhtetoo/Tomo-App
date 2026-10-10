@@ -52,11 +52,14 @@ root project and the unchanged `assets/data/n2.json` fixture.
 
 The app now uses the official Stitch coral design: centralized dark/light
 ThemeData, rounded bordered cards, coral buttons and navigation, and bundled
-Noto Sans JP typography. The dashboard restores the selected level and shows
-real daily reviews, learned words, accuracy, streak, due count and category
-progress. Its level control is labeled `JLPT N2 · Change Level`. Continue
-Learning restores the last browsed chapter, while Resume Flashcards
-independently restores an unfinished card session and its exact position.
+Noto Sans JP typography. Home starts with `What will you learn today?` and
+places the four repository-backed Study Categories first. Empty categories are
+visibly locked. Its level control is labeled `JLPT N2 · Change Level` without
+duplicating the level in the brand header. A compact, conditional continuation
+section restores the last browsed chapter and keeps unfinished flashcards
+available. The review reminder appears only when saved data has due words.
+Today's Learning shows real learned, reviewed and streak values without
+promoting accuracy on Home.
 
 Normal learning navigation is Home → Study → Category → Source → Chapter →
 Learning List → Word Detail. A chapter opens a searchable reading list first;
@@ -261,7 +264,8 @@ Sync-status fields provide a future boundary without implementing Supabase.
 
 ## Verification and next work
 
-See the [Phase 2 UX refinement report](docs/phase2-ux-refinement.md),
+See the [Home UX redesign report](docs/phase2-home-redesign.md),
+the [Phase 2 UX refinement report](docs/phase2-ux-refinement.md),
 the [Stitch UI implementation report](docs/phase2-stitch-implementation.md),
 the [Phase 2 review and device checklist](docs/phase2-audit.md), and
 [verification results](docs/verification.md) for commands and their actual
