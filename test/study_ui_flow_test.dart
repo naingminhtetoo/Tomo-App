@@ -87,7 +87,7 @@ void main() {
       }
 
       await shot('home');
-      await tapText('Start Learning');
+      await tapText('See all ›');
       await shot('study');
       await tapText('Kanji');
       expect(find.text('Choose a learning source'), findsNothing);
@@ -144,9 +144,15 @@ void main() {
       router.go('/home');
       await tester.pumpAndSettle();
       await shot('home-resume');
-      expect(find.text('Continue Learning'), findsOneWidget);
+      expect(find.text('Pick up where you left off'), findsOneWidget);
       expect(find.text('Resume Flashcards'), findsOneWidget);
-      await tapText('Continue Learning');
+      await tester.ensureVisible(
+        find.byKey(const Key('continue-learning-card')),
+      );
+      tester
+          .widget<InkWell>(find.byKey(const Key('continue-learning-card')))
+          .onTap!();
+      await tester.pumpAndSettle();
       expect(find.text('Learning List'), findsOneWidget);
       router.go('/home');
       await tester.pumpAndSettle();

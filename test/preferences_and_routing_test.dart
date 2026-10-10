@@ -104,9 +104,9 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('Japanese Study Companion'), findsOneWidget);
-      expect(find.text('JLPT N2'), findsOneWidget);
+      expect(find.text('JLPT N2 · Change Level'), findsOneWidget);
       expect(tester.takeException(), isNull);
-      await tester.tap(find.text('Start Learning'));
+      await tester.tap(find.text('See all ›'));
       await tester.pumpAndSettle();
       expect(find.text('Vocabulary'), findsWidgets);
       expect(find.text('Kanji'), findsOneWidget);
@@ -245,7 +245,7 @@ void main() {
         UncontrolledProviderScope(container: container, child: const TomoApp()),
       );
       await tester.pumpAndSettle();
-      expect(find.text('Reviewed today'), findsOneWidget);
+      expect(find.text("Today's Learning"), findsOneWidget);
       final router = container.read(appRouterProvider);
       final repository = container.read(progressRepositoryProvider);
       final content = (await TestVocabularyRepository().loadLocal(
