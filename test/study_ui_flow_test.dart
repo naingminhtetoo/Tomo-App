@@ -14,6 +14,7 @@ import 'package:tomo/features/level_selection/data/app_preferences.dart';
 import 'package:tomo/features/level_selection/domain/jlpt_level.dart';
 import 'package:tomo/features/level_selection/presentation/level_catalog_controller.dart';
 import 'package:tomo/features/progress/presentation/progress_providers.dart';
+import 'package:tomo/features/study_menu/presentation/chapter_screen.dart';
 import 'package:tomo/features/vocabulary/presentation/word_detail_sheet.dart';
 import 'support/test_repositories.dart';
 
@@ -93,9 +94,12 @@ void main() {
       expect(find.text('Choose a learning source'), findsNothing);
       await shot('sources');
       await tapText('Kanji（総まとめ）');
-      expect(find.text('Chapter selection'), findsOneWidget);
+      expect(find.text('Course Roadmap'), findsOneWidget);
       await shot('chapters');
-      await tapText('Browse Words');
+      final firstChapter = find.byType(CompactChapterRow).first;
+      await tester.ensureVisible(firstChapter);
+      await tester.tap(firstChapter);
+      await tester.pumpAndSettle();
       expect(find.text('禁止'), findsOneWidget);
       expect(find.textContaining('きんし'), findsOneWidget);
       expect(find.textContaining('prohibition'), findsOneWidget);
