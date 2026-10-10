@@ -41,8 +41,9 @@ class HomeScreen extends ConsumerWidget {
               children: [
                 OutlinedButton.icon(
                   onPressed: () => context.pushNamed(AppRoutes.levels),
-                  icon: const Icon(Icons.circle, size: 9),
-                  label: const Text('Change level'),
+                  icon: const Icon(Icons.expand_more),
+                  iconAlignment: IconAlignment.end,
+                  label: Text('JLPT ${settings.level.label} · Change Level'),
                 ),
                 ref
                     .watch(studyActivityProvider(settings.level))
@@ -62,7 +63,10 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 28),
-            ContinueStudyCard(level: settings.level),
+            ContinueStudyCard(
+              level: settings.level,
+              lastLearning: settings.lastLearning,
+            ),
             const SizedBox(height: 24),
             ProgressSummary(level: settings.level),
             const SizedBox(height: 24),

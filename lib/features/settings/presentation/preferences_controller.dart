@@ -30,6 +30,18 @@ class PreferencesController extends AsyncNotifier<AppPreferences> {
   Future<void> setShuffle(bool enabled) =>
       _save(state.requireValue.copyWith(shuffle: enabled));
 
+  Future<void> rememberLearning(LastLearningActivity activity) {
+    final current = state.requireValue;
+    final saved = current.lastLearning;
+    if (saved?.level == activity.level &&
+        saved?.category == activity.category &&
+        saved?.source == activity.source &&
+        saved?.deckId == activity.deckId) {
+      return Future.value();
+    }
+    return _save(current.copyWith(lastLearning: activity));
+  }
+
   Future<void> _save(AppPreferences preferences) async {
     await ref.read(preferencesRepositoryProvider).save(preferences);
     if (ref.mounted) state = AsyncData(preferences);

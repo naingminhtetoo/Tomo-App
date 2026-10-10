@@ -14,6 +14,7 @@ import '../../progress/domain/progress_repository.dart';
 import '../../settings/presentation/preferences_controller.dart';
 import '../../study_menu/domain/study_catalog.dart';
 import '../../study_menu/presentation/catalog_provider.dart';
+import '../../vocabulary/domain/entities/study_deck.dart';
 import 'progress_providers.dart';
 
 class ProgressScreen extends ConsumerWidget {
@@ -101,7 +102,7 @@ class _ProgressContent extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: TomoSpacing.lg),
-        _ChapterProgress(catalogData),
+        _ChapterProgress(level: level, catalog: catalogData),
         const SizedBox(height: TomoSpacing.lg),
         SurfacePanel(
           padding: 18,
@@ -483,39 +484,104 @@ class _NeedsReview extends StatelessWidget {
 }
 
 class _ChapterProgress extends StatelessWidget {
-  const _ChapterProgress(this.catalog);
+  const _ChapterProgress({required this.level, required this.catalog});
 
+  final JlptLevel level;
   final StudyCatalog catalog;
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: ExpansionTile(
-      shape: const Border(),
-      title: const Text('Chapter Progress'),
-      subtitle: const Text('See progress across installed chapters'),
-      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      children: catalog.content.decks
-          .where((deck) => deck.contentIds.isNotEmpty)
-          .map((deck) {
-            final progress = catalog.chapterProgress[deck.id]!;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(child: Text(StudyCatalog.deckTitle(deck))),
-                      Text('${progress.learned} / ${progress.total}'),
-                    ],
+  Widget build(BuildContext context) {
+    final groups = <StudyCategory, Map<String, List<StudyDeck>>>{};
+    for (final deck in catalog.content.decks.where(
+      (deck) => deck.contentIds.isNotEmpty,
+    )) {
+      final category = StudyCatalog.categoryForDeck(deck);
+      final source = deck.source ?? deck.category;
+      ((groups[category] ??= {})[source] ??= []).add(deck);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'Chapter Progress by Source',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        const SizedBox(height: TomoSpacing.sm),
+        for (final category in StudyCategory.values)
+          for (final entry in (groups[category] ?? const {}).entries)
+            Padding(
+              padding: const EdgeInsets.only(bottom: TomoSpacing.sm),
+              child: Card(
+                child: ExpansionTile(
+                  shape: const Border(),
+                  title: Text(
+                    '${level.label} / ${category.label} / ${StudyCatalog.sourceTitle(entry.key)}',
                   ),
-                  const SizedBox(height: 7),
-                  LinearProgressIndicator(value: progress.fraction),
-                ],
+                  subtitle: Text(
+                    '${entry.value.length} ${entry.value.length == 1 ? 'chapter' : 'chapters'}',
+                  ),
+                  childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                  children: entry.value.map((deck) {
+                    final progress = catalog.chapterProgress[deck.id]!;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: Material(
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHigh,
+                        borderRadius: BorderRadius.circular(TomoRadii.control),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(
+                            TomoRadii.control,
+                          ),
+                          onTap: () => context.pushNamed(
+                            AppRoutes.learningList,
+                            pathParameters: {
+                              'level': level.name,
+                              'kind': category.name,
+                            },
+                            queryParameters: {
+                              'source': entry.key,
+                              'deck': deck.id,
+                            },
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(TomoSpacing.md),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        StudyCatalog.deckTitle(deck),
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.titleMedium,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${progress.learned} / ${progress.total}',
+                                    ),
+                                    const SizedBox(width: 6),
+                                    const Icon(Icons.chevron_right),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                LinearProgressIndicator(
+                                  value: progress.fraction,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
               ),
-            );
-          })
-          .toList(),
-    ),
-  );
+            ),
+      ],
+    );
+  }
 }

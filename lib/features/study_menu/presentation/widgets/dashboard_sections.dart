@@ -6,6 +6,7 @@ import '../../../../app/theme/tomo_theme.dart';
 import '../../../../core/widgets/tomo_scaffold.dart';
 import '../../../../core/widgets/ui_action.dart';
 import '../../../level_selection/domain/jlpt_level.dart';
+import '../../../level_selection/data/app_preferences.dart';
 import '../../../progress/presentation/progress_providers.dart';
 import '../../../progress/presentation/learning_state_controller.dart';
 import '../../domain/study_catalog.dart';
@@ -19,8 +20,13 @@ IconData categoryIcon(StudyCategory c) => switch (c) {
 };
 
 class ContinueStudyCard extends ConsumerWidget {
-  const ContinueStudyCard({super.key, required this.level});
+  const ContinueStudyCard({
+    super.key,
+    required this.level,
+    required this.lastLearning,
+  });
   final JlptLevel level;
+  final LastLearningActivity? lastLearning;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context), scheme = Theme.of(context).colorScheme;
@@ -30,6 +36,25 @@ class ContinueStudyCard extends ConsumerWidget {
     final deck = catalog?.content.decks
         .where((d) => d.id == session?.deckId)
         .firstOrNull;
+    final browse = lastLearning?.level == level ? lastLearning : null;
+    final browseCategory = StudyCategory.tryParse(browse?.category);
+    final browseSource = catalog == null || browseCategory == null
+        ? null
+        : catalog
+              .sources(browseCategory)
+              .where((source) => source.id == browse?.source)
+              .firstOrNull;
+    final browseDeck = catalog?.content.decks
+        .where((candidate) => candidate.id == browse?.deckId)
+        .firstOrNull;
+    final canContinueLearning =
+        browse != null &&
+        browseCategory != null &&
+        browseSource != null &&
+        (browse.deckId.startsWith('all:') || browseDeck != null);
+    final browseTitle = browseDeck == null
+        ? browseSource?.title
+        : StudyCatalog.deckTitle(browseDeck);
     return SurfacePanel(
       accent: true,
       child: Column(
@@ -41,7 +66,11 @@ class ContinueStudyCard extends ConsumerWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: TomoBadge(
-                    session == null ? 'READY TO STUDY' : 'IN PROGRESS',
+                    canContinueLearning
+                        ? 'CONTINUE LEARNING'
+                        : session == null
+                        ? 'READY TO LEARN'
+                        : 'FLASHCARDS IN PROGRESS',
                   ),
                 ),
               ),
@@ -70,7 +99,9 @@ class ContinueStudyCard extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            session == null
+            canContinueLearning
+                ? browseTitle ?? 'Continue your learning list'
+                : session == null
                 ? 'Your next chapter\nstarts here'
                 : deck == null
                 ? 'Continue your study session'
@@ -80,7 +111,23 @@ class ContinueStudyCard extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 16),
-          if (active.hasError)
+          if (canContinueLearning) ...[
+            Text(
+              'JLPT ${level.label} · ${browseCategory.label} · ${browseSource.title}',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: scheme.onSurfaceVariant,
+              ),
+            ),
+            if (session != null) ...[
+              const SizedBox(height: 10),
+              Text(
+                'An unfinished flashcard session is also ready to resume.',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: scheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ] else if (active.hasError)
             const Text('Your saved session could not be loaded.')
           else if (session != null) ...[
             Text(
@@ -92,34 +139,63 @@ class ContinueStudyCard extends ConsumerWidget {
             ),
           ] else
             Text(
-              'Start with a local N2 collection. Your place is saved as you study.',
+              'Choose a local ${level.label} collection and browse every word before practicing.',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: scheme.onSurfaceVariant,
               ),
             ),
           const SizedBox(height: 26),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton.icon(
-              key: const Key('home-study-button'),
-              onPressed: active.isLoading
-                  ? null
-                  : () => session == null
-                        ? context.pushNamed(
-                            AppRoutes.study,
-                            pathParameters: {'level': level.name},
-                          )
-                        : context.pushNamed(
-                            AppRoutes.session,
-                            pathParameters: {'level': session.level},
-                          ),
-              icon: const Icon(Icons.arrow_forward),
-              iconAlignment: IconAlignment.end,
-              label: Text(
-                session == null ? 'Start Studying' : 'Continue Session',
+          if (canContinueLearning)
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                key: const Key('home-study-button'),
+                onPressed: () => context.pushNamed(
+                  AppRoutes.learningList,
+                  pathParameters: {
+                    'level': browse.level.name,
+                    'kind': browse.category,
+                  },
+                  queryParameters: {
+                    'source': browse.source,
+                    'deck': browse.deckId,
+                  },
+                ),
+                icon: const Icon(Icons.view_list_outlined),
+                iconAlignment: IconAlignment.end,
+                label: const Text('Continue Learning'),
+              ),
+            )
+          else if (session == null)
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                key: const Key('home-study-button'),
+                onPressed: active.isLoading
+                    ? null
+                    : () => context.pushNamed(
+                        AppRoutes.study,
+                        pathParameters: {'level': level.name},
+                      ),
+                icon: const Icon(Icons.arrow_forward),
+                iconAlignment: IconAlignment.end,
+                label: const Text('Start Learning'),
               ),
             ),
-          ),
+          if (session != null) ...[
+            if (canContinueLearning) const SizedBox(height: TomoSpacing.sm),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => context.pushNamed(
+                  AppRoutes.session,
+                  pathParameters: {'level': session.level},
+                ),
+                icon: const Icon(Icons.style_outlined),
+                label: const Text('Resume Flashcards'),
+              ),
+            ),
+          ],
         ],
       ),
     );
