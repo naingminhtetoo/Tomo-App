@@ -89,6 +89,7 @@ void main() {
         '/study/n2',
         '/study/n2/category/kanji',
         '/study/n2/category/kanji/source/kanji',
+        '/study/n2/learn/kanji?source=kanji&deck=n2%2Fkanji%2F0',
         '/review',
         '/progress',
         '/settings',
@@ -190,7 +191,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(await repository.loadActiveSession(), isNull);
       expect((await repository.summary()).totalReviews, 0);
-      expect(find.text('Session complete'), findsOneWidget);
+      expect(find.text('Learning session complete'), findsOneWidget);
       expect(tester.takeException(), isNull);
     },
   );

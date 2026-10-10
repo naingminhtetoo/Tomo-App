@@ -9,6 +9,7 @@ import 'package:tomo/app/app.dart';
 import 'package:tomo/app/providers.dart';
 import 'package:tomo/app/router/app_router.dart';
 import 'package:tomo/features/level_selection/data/app_preferences.dart';
+import 'package:tomo/features/level_selection/domain/jlpt_level.dart';
 import 'package:tomo/features/settings/presentation/preferences_controller.dart';
 
 import 'support/test_repositories.dart';
@@ -38,6 +39,16 @@ void main() {
           .read(preferencesControllerProvider.notifier)
           .setTheme(ThemeMode.light);
       await first.read(preferencesControllerProvider.notifier).setShuffle(true);
+      await first
+          .read(preferencesControllerProvider.notifier)
+          .rememberLearning(
+            const LastLearningActivity(
+              level: JlptLevel.n2,
+              category: 'kanji',
+              source: 'kanji',
+              deckId: 'kanji-week-1',
+            ),
+          );
       first.dispose();
       final second = ProviderContainer(
         overrides: [
@@ -60,6 +71,7 @@ void main() {
       );
       expect(preferences.themeMode, ThemeMode.light);
       expect(preferences.shuffle, isTrue);
+      expect(preferences.lastLearning?.deckId, 'kanji-week-1');
     },
   );
   for (final width in [320.0, 1100.0]) {
@@ -94,7 +106,7 @@ void main() {
       expect(find.text('Japanese Study Companion'), findsOneWidget);
       expect(find.text('JLPT N2'), findsOneWidget);
       expect(tester.takeException(), isNull);
-      await tester.tap(find.text('Start Studying'));
+      await tester.tap(find.text('Start Learning'));
       await tester.pumpAndSettle();
       expect(find.text('Vocabulary'), findsWidgets);
       expect(find.text('Kanji'), findsOneWidget);
@@ -136,6 +148,40 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('JLPT level'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+  testWidgets('Home Change Level control opens level selection', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWith((ref) {
+            final db = AppDatabase(NativeDatabase.memory());
+            ref.onDispose(() {
+              db.close();
+            });
+            return db;
+          }),
+          vocabularyRepositoryProvider.overrideWithValue(
+            TestVocabularyRepository(),
+          ),
+          preferencesRepositoryProvider.overrideWithValue(
+            AppPreferencesRepository(MemoryPreferences()),
+          ),
+        ],
+        child: const TomoApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    final changeLevel = find.text('JLPT N2 · Change Level');
+    expect(changeLevel, findsOneWidget);
+    await tester.tap(
+      find.widgetWithText(OutlinedButton, 'JLPT N2 · Change Level'),
+    );
+    for (var frame = 0; frame < 5; frame++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.text('JLPT level'), findsOneWidget);
   });
   testWidgets('settings changes the live theme without resetting navigation', (
     tester,
@@ -201,9 +247,14 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Reviewed today'), findsOneWidget);
       final router = container.read(appRouterProvider);
-      router.go('/study/n2/deck/kanji');
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Start studying'));
+      final repository = container.read(progressRepositoryProvider);
+      final content = (await TestVocabularyRepository().loadLocal(
+        JlptLevel.n2,
+      )).content;
+      for (final id in content.vocabulary.keys.take(2).toList().reversed) {
+        await repository.toggleFavorite(id);
+      }
+      router.go('/study/n2/review/favorites');
       await tester.pumpAndSettle();
       expect(find.text('禁止'), findsOneWidget);
       await tester.tap(find.text('Tap to reveal'));
@@ -211,7 +262,6 @@ void main() {
       expect(find.text('prohibition'), findsOneWidget);
       await tester.tap(find.text('Good'));
       await tester.pumpAndSettle();
-      final repository = container.read(progressRepositoryProvider);
       final active = (await repository.loadActiveSession())!;
       expect(active.currentIndex, 1);
       expect(
@@ -226,8 +276,8 @@ void main() {
       );
       router.go('/home');
       await tester.pumpAndSettle();
-      expect(find.text('Continue Session'), findsOneWidget);
-      await tester.tap(find.text('Continue Session'));
+      expect(find.text('Resume Flashcards'), findsOneWidget);
+      await tester.tap(find.text('Resume Flashcards'));
       await tester.pumpAndSettle();
       expect(find.textContaining('2 / '), findsOneWidget);
       expect(find.text('Tap to reveal'), findsOneWidget);

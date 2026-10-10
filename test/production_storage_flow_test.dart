@@ -9,7 +9,6 @@ import 'package:tomo/features/flashcards/presentation/study_controller.dart';
 import 'package:tomo/features/level_selection/data/app_preferences.dart';
 import 'package:tomo/features/level_selection/domain/jlpt_level.dart';
 import 'package:tomo/features/progress/domain/progress_repository.dart';
-import 'package:tomo/features/vocabulary/domain/entities/deck_category.dart';
 import 'package:tomo/features/vocabulary/domain/entities/level_content.dart';
 import 'package:tomo/features/vocabulary/presentation/vocabulary_controller.dart';
 import 'support/test_repositories.dart';
@@ -47,23 +46,33 @@ void main() {
       late String cardId;
       late ActiveStudySession saved;
       try {
+        final content = await first.read(
+          levelContentProvider(JlptLevel.n2).future,
+        );
+        expect(content.content.vocabulary.length, 1747);
+        final cards = content.content.vocabulary.values.take(2).toList();
+        final firstCard = cards.first;
+        expect(firstCard.word, '禁止');
+        cardId = firstCard.id;
+        final repository = first.read(progressRepositoryProvider);
+        for (final card in cards.reversed) {
+          await repository.toggleFavorite(card.id);
+        }
+        await repository.toggleDifficult(cardId);
         final request = studyRequest(
           level: JlptLevel.n2,
-          category: DeckCategory.kanji,
+          reviewFilter: 'favorites',
           autoStart: true,
         );
         first.listen(studyControllerProvider(request), (_, _) {});
         final initial = await first.read(
           studyControllerProvider(request).future,
         );
-        expect(initial.content.vocabulary.length, 1747);
         expect(initial.card!.word, '禁止');
-        cardId = initial.card!.id;
+        expect(initial.mode, FlashcardMode.review);
         final controller = first.read(
           studyControllerProvider(request).notifier,
         );
-        await controller.toggleFavorite();
-        await controller.toggleDifficult();
         controller.flip();
         await controller.rate(ReviewRating.good);
         saved = (await first

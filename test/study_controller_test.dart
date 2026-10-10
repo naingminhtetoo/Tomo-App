@@ -57,16 +57,18 @@ void main() {
       container.read(studyControllerProvider(key)).requireValue;
 
   test(
-    'flip, previous and next preserve canonical order and do not record reviews',
+    'Learn Mode shows meaning while navigation records no reviews',
     () async {
       final initial = await load(request);
       expect(initial.card!.word, '禁止');
       expect(initial.ids, initial.baselineIds);
+      expect(initial.mode, FlashcardMode.learn);
+      expect(initial.flipped, isTrue);
       controller(request).flip();
-      expect(view(request).flipped, isTrue);
+      expect(view(request).flipped, isFalse);
       await controller(request).move(1);
       expect(view(request).index, 1);
-      expect(view(request).flipped, isFalse);
+      expect(view(request).flipped, isTrue);
       await controller(request).move(-1);
       await controller(request).move(-1);
       expect(view(request).index, 0);
@@ -101,35 +103,41 @@ void main() {
       expect(view(resumedRequest).index, 0);
     },
   );
-  test(
-    'flags, chapter progress and recent reviews share persisted state',
-    () async {
-      final initial = await load(request);
-      final id = initial.card!.id;
-      await controller(request).toggleFavorite();
-      await controller(request).toggleDifficult();
-      controller(request).flip();
-      await controller(request).rate(ReviewRating.again);
-      final p = (await repository.findByCardId(id))!;
-      expect(p.favorite, isTrue);
-      expect(p.difficult, isTrue);
-      expect(p.incorrectCount, 1);
-      expect(
-        (await repository.getReviewHistory(id)).single.rating,
-        ReviewRating.again,
-      );
-      expect((await repository.loadActiveSession())!.currentIndex, 1);
-      final catalog = await container.read(
-        studyCatalogProvider(JlptLevel.n2).future,
-      );
-      expect(catalog.chapterProgress[initial.deckId]!.learned, 1);
-      expect(catalog.categoryProgress[StudyCategory.kanji]!.learned, 1);
-      expect((await repository.getRecentlyLearned()).single.contentId, id);
-      expect((await repository.getWeakItems()).single.contentId, id);
-      expect((await repository.getCommonMistakes()).single.contentId, id);
-    },
-  );
-  test('single word practice completes and retains review history', () async {
+  test('flags and Review Mode share persisted state', () async {
+    final initial = await load(request);
+    final id = initial.card!.id;
+    await controller(request).toggleFavorite();
+    await controller(request).toggleDifficult();
+    await controller(request).end();
+    final review = studyRequest(
+      level: JlptLevel.n2,
+      reviewFilter: 'weak',
+      autoStart: true,
+    );
+    final reviewView = await load(review);
+    expect(reviewView.mode, FlashcardMode.review);
+    expect(reviewView.flipped, isFalse);
+    controller(review).flip();
+    await controller(review).rate(ReviewRating.again);
+    final p = (await repository.findByCardId(id))!;
+    expect(p.favorite, isTrue);
+    expect(p.difficult, isTrue);
+    expect(p.incorrectCount, 1);
+    expect(
+      (await repository.getReviewHistory(id)).single.rating,
+      ReviewRating.again,
+    );
+    expect(await repository.loadActiveSession(), isNull);
+    final catalog = await container.read(
+      studyCatalogProvider(JlptLevel.n2).future,
+    );
+    expect(catalog.chapterProgress[initial.deckId]!.learned, 1);
+    expect(catalog.categoryProgress[StudyCategory.kanji]!.learned, 1);
+    expect((await repository.getRecentlyLearned()).single.contentId, id);
+    expect((await repository.getWeakItems()).single.contentId, id);
+    expect((await repository.getCommonMistakes()).single.contentId, id);
+  });
+  test('single word Learn Mode records no review history', () async {
     final content = (await TestVocabularyRepository().loadLocal(
       JlptLevel.n2,
     )).content;
@@ -139,12 +147,20 @@ void main() {
       autoStart: true,
     );
     await load(key);
-    controller(key).flip();
-    await controller(key).rate(ReviewRating.easy);
+    expect(view(key).mode, FlashcardMode.learn);
+    expect(view(key).flipped, isTrue);
+    await expectLater(
+      controller(key).rate(ReviewRating.easy),
+      throwsStateError,
+    );
+    await controller(key).end();
     expect(view(key).completed, isTrue);
     expect(view(key).card, isNull);
     expect(await repository.loadActiveSession(), isNull);
-    expect((await repository.getStudySessions()).single.reviewedCount, 1);
+    expect(
+      await repository.getReviewHistory(content.vocabulary.keys.first),
+      isEmpty,
+    );
   });
   test('empty and missing content create no session', () async {
     for (final key in [
@@ -210,6 +226,8 @@ void main() {
       final result = await load(key);
       expect(result.ids, [id]);
       expect(result.active!.studyMode, 'review');
+      expect(result.mode, FlashcardMode.review);
+      expect(result.flipped, isFalse);
       await repository.toggleFavorite(id);
       container.invalidate(studyControllerProvider(key));
       final resumed = await container.read(studyControllerProvider(key).future);
