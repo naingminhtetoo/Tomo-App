@@ -11,6 +11,7 @@ class TomoScaffold extends StatelessWidget {
     this.actions,
     this.showNavigation = true,
     this.brandHeader = false,
+    this.showBrandLevel = true,
     this.levelLabel,
     this.sectionLabel = 'Japanese Study Companion',
     this.maxContentWidth = 920,
@@ -20,6 +21,7 @@ class TomoScaffold extends StatelessWidget {
   final Widget child;
   final List<Widget>? actions;
   final bool showNavigation, brandHeader;
+  final bool showBrandLevel;
   final String? levelLabel;
   final String sectionLabel;
   final double maxContentWidth;
@@ -32,7 +34,10 @@ class TomoScaffold extends StatelessWidget {
         automaticallyImplyLeading: !brandHeader,
         toolbarHeight: 68,
         title: brandHeader
-            ? TomoBrand(levelLabel: levelLabel, sectionLabel: sectionLabel)
+            ? TomoBrand(
+                levelLabel: showBrandLevel ? levelLabel : null,
+                sectionLabel: sectionLabel,
+              )
             : Text(title, overflow: TextOverflow.ellipsis),
         actions: actions,
       ),
