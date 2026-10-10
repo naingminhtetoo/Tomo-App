@@ -58,9 +58,16 @@ class FlashcardScreen extends ConsumerWidget {
           children: [
             Icon(Icons.check_circle_outline, size: 54, color: scheme.primary),
             const SizedBox(height: 20),
-            Text('Session complete', style: theme.textTheme.headlineMedium),
+            Text(
+              view.isReview ? 'Review complete' : 'Learning session complete',
+              style: theme.textTheme.headlineMedium,
+            ),
             const SizedBox(height: 12),
-            const Text('Your reviews have been saved on this device.'),
+            Text(
+              view.isReview
+                  ? 'Your reviews have been saved on this device.'
+                  : 'Viewing cards did not record review answers.',
+            ),
             const SizedBox(height: 24),
             FilledButton(
               onPressed: () => context.go('/home'),
@@ -115,7 +122,7 @@ class FlashcardScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '${request.level.label} Vocabulary',
+                    view.isReview ? 'Review Mode' : 'Learn Mode',
                     style: theme.textTheme.titleLarge,
                   ),
                   Text(
@@ -203,7 +210,7 @@ class FlashcardScreen extends ConsumerWidget {
           child: Semantics(
             button: true,
             label:
-                'Flashcard ${card.word}. ${view.flipped ? 'Hide meaning' : 'Reveal meaning'}',
+                'Flashcard ${card.word}. ${view.flipped ? 'Hide meaning' : 'Show meaning'}',
             child: InkWell(
               borderRadius: BorderRadius.circular(TomoRadii.card),
               onTap: view.busy ? null : controller.flip,
@@ -218,7 +225,9 @@ class FlashcardScreen extends ConsumerWidget {
                             spacing: 8,
                             runSpacing: 8,
                             children: [
-                              const TomoBadge('VOCABULARY DRILL'),
+                              TomoBadge(
+                                view.isReview ? 'REVIEW MODE' : 'LEARN MODE',
+                              ),
                               if (card.partOfSpeech.isNotEmpty)
                                 TomoBadge(
                                   card.partOfSpeech.join(' · ').toUpperCase(),
@@ -313,8 +322,12 @@ class FlashcardScreen extends ConsumerWidget {
                         Flexible(
                           child: Text(
                             view.flipped
-                                ? 'Tap to hide meaning'
-                                : 'Tap to reveal',
+                                ? view.isReview
+                                      ? 'Meaning revealed'
+                                      : 'Tap to hide meaning for self-testing'
+                                : view.isReview
+                                ? 'Tap to reveal'
+                                : 'Tap to show meaning',
                             textAlign: TextAlign.center,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: scheme.onSurfaceVariant,
@@ -354,7 +367,7 @@ class FlashcardScreen extends ConsumerWidget {
                       );
                     }
                   },
-            child: const Text('Start studying'),
+            child: Text(view.isReview ? 'Start Review' : 'Start Learning'),
           )
         else
           Row(
@@ -384,7 +397,11 @@ class FlashcardScreen extends ConsumerWidget {
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
-                          view.flipped ? 'Hide Meaning' : 'Reveal Meaning',
+                          view.flipped
+                              ? 'Hide Meaning'
+                              : view.isReview
+                              ? 'Reveal Meaning'
+                              : 'Show Meaning',
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -403,35 +420,37 @@ class FlashcardScreen extends ConsumerWidget {
               ),
             ],
           ),
-        const SizedBox(height: 16),
-        Row(
-          children: ReviewRating.values
-              .map(
-                (rating) => Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        foregroundColor: _ratingColor(rating),
-                        side: BorderSide(
-                          color: _ratingColor(rating).withValues(alpha: 0.5),
+        if (view.isReview) ...[
+          const SizedBox(height: 16),
+          Row(
+            children: ReviewRating.values
+                .map(
+                  (rating) => Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 3),
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          foregroundColor: _ratingColor(rating),
+                          side: BorderSide(
+                            color: _ratingColor(rating).withValues(alpha: 0.5),
+                          ),
                         ),
+                        onPressed:
+                            view.active == null || !view.flipped || view.busy
+                            ? null
+                            : () => runUiAction(
+                                context,
+                                () => controller.rate(rating),
+                              ),
+                        child: FittedBox(child: Text(_rating(rating))),
                       ),
-                      onPressed:
-                          view.active == null || !view.flipped || view.busy
-                          ? null
-                          : () => runUiAction(
-                              context,
-                              () => controller.rate(rating),
-                            ),
-                      child: FittedBox(child: Text(_rating(rating))),
                     ),
                   ),
-                ),
-              )
-              .toList(),
-        ),
+                )
+                .toList(),
+          ),
+        ],
         const SizedBox(height: 16),
         Wrap(
           alignment: WrapAlignment.center,
@@ -495,11 +514,11 @@ class FlashcardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Tap the card to reveal its meaning. Previous and Next change your saved position without recording a review.',
+                'Learn Mode shows meanings immediately. Hide a meaning when you want to test yourself. Viewing and navigation do not record an answer.',
               ),
               const SizedBox(height: 12),
               const Text(
-                'Again, Hard, Good and Easy save a review. Automatic interval scheduling and audio are not available yet.',
+                'Review Mode hides meanings first. Again, Hard, Good and Easy save a review after reveal. Automatic scheduling and audio are not available yet.',
               ),
               const SizedBox(height: 20),
               FilledButton(

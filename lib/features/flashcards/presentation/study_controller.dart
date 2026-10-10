@@ -43,12 +43,15 @@ final studyRandomProvider = Provider<Random>((ref) => Random());
 final studyControllerProvider = AsyncNotifierProvider.autoDispose
     .family<StudyController, StudyView, StudyRequest>(StudyController.new);
 
+enum FlashcardMode { learn, review }
+
 class StudyView {
   StudyView({
     required this.content,
     required List<String> baselineIds,
     required this.deckId,
     required this.title,
+    required this.mode,
     this.active,
     this.conflict,
     this.flipped = false,
@@ -59,8 +62,10 @@ class StudyView {
   final LevelContent content;
   final List<String> baselineIds;
   final String deckId, title;
+  final FlashcardMode mode;
   final ActiveStudySession? active, conflict;
   final bool flipped, shuffle, busy, completed;
+  bool get isReview => mode == FlashcardMode.review;
   List<String> get ids => active?.contentIds ?? baselineIds;
   int get index => active?.currentIndex ?? 0;
   VocabularyCard? get card =>
@@ -78,6 +83,7 @@ class StudyView {
     baselineIds: baselineIds,
     deckId: deckId,
     title: title,
+    mode: mode,
     active: clearActive ? null : active ?? this.active,
     conflict: clearConflict ? null : conflict,
     flipped: flipped ?? this.flipped,
@@ -98,6 +104,13 @@ class StudyController extends AsyncNotifier<StudyView> {
     )).content;
     final preferences = await ref.read(preferencesControllerProvider.future);
     final saved = await _repository.loadActiveSession();
+    final mode = request.resume
+        ? saved?.studyMode == 'review'
+              ? FlashcardMode.review
+              : FlashcardMode.learn
+        : request.reviewFilter == null
+        ? FlashcardMode.learn
+        : FlashcardMode.review;
     var deckId = request.deckId;
     var title = 'Study session';
     List<String> ids = [];
@@ -194,9 +207,11 @@ class StudyController extends AsyncNotifier<StudyView> {
       baselineIds: ids,
       deckId: deckId,
       title: title,
+      mode: mode,
       active: active,
       conflict: matching ? null : saved,
       shuffle: active?.shuffleEnabled ?? preferences.shuffle,
+      flipped: mode == FlashcardMode.learn,
     );
     if (request.autoStart &&
         view.active == null &&
@@ -247,7 +262,7 @@ class StudyController extends AsyncNotifier<StudyView> {
       deckId: view.deckId,
       level: request.level.name,
       currentIndex: 0,
-      studyMode: request.reviewFilter == null ? 'flashcards' : 'review',
+      studyMode: view.isReview ? 'review' : 'learn',
       shuffleEnabled: view.shuffle,
       startedAt: now,
       updatedAt: now,
@@ -282,7 +297,7 @@ class StudyController extends AsyncNotifier<StudyView> {
     return view.copyWith(
       active: active,
       clearConflict: true,
-      flipped: false,
+      flipped: !view.isReview,
       completed: false,
     );
   });
@@ -334,7 +349,7 @@ class StudyController extends AsyncNotifier<StudyView> {
     );
     final next = _session(current, index: index);
     await _repository.saveActiveSession(next);
-    return view.copyWith(active: next, flipped: false);
+    return view.copyWith(active: next, flipped: !view.isReview);
   });
   Future<void> setShuffle(bool enabled) => _run((view) async {
     if (view.active == null) return view.copyWith(shuffle: enabled);
@@ -343,10 +358,17 @@ class StudyController extends AsyncNotifier<StudyView> {
     if (enabled) order.shuffle(ref.read(studyRandomProvider));
     final next = _session(view.active!, index: 0, shuffle: enabled, ids: order);
     await _repository.saveActiveSession(next);
-    return view.copyWith(active: next, shuffle: enabled, flipped: false);
+    return view.copyWith(
+      active: next,
+      shuffle: enabled,
+      flipped: !view.isReview,
+    );
   });
   Future<void> rate(ReviewRating rating) => _run((view) async {
-    if (!view.flipped || view.active == null || view.card == null) {
+    if (!view.isReview ||
+        !view.flipped ||
+        view.active == null ||
+        view.card == null) {
       throw StateError('Reveal the answer before rating.');
     }
     await _requireCurrent(view);
