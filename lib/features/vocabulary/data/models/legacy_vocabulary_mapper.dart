@@ -4,6 +4,7 @@ import 'package:crypto/crypto.dart';
 
 import '../../../../core/errors/content_exception.dart';
 import '../../../../core/utils/content_json.dart';
+import '../../../../core/localization/content_language.dart';
 import '../../../level_selection/domain/jlpt_level.dart';
 import '../../../kanji/domain/kanji_content.dart';
 import '../../../grammar/domain/grammar_content.dart';
@@ -125,6 +126,7 @@ class LegacyVocabularyMapper {
       category: category,
       chapter: chapter,
       romaji: j['romaji'] as String?,
+      explanation: LocalizedText.fromJson(j['explanation']),
       partOfSpeech: jsonTexts(j['partOfSpeech']),
       kanjiIds: jsonTexts(j['kanjiIds']),
       examples: (j['examples'] == null ? const [] : jsonList(j['examples']))

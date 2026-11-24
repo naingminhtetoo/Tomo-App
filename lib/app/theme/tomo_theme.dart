@@ -82,6 +82,11 @@ class TomoTheme {
       colorScheme: scheme,
       brightness: brightness,
       fontFamily: 'NotoSansJP',
+      fontFamilyFallback: const [
+        'Noto Sans Myanmar',
+        'Myanmar Text',
+        'sans-serif',
+      ],
     );
     final text = base.textTheme;
     return base.copyWith(

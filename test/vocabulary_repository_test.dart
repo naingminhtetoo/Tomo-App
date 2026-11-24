@@ -217,8 +217,19 @@ void main() {
             'word': '把握',
             'reading': 'はあく',
             'meanings': ['understanding'],
+            'explanation': {
+              'ja': '内容を十分に理解すること。',
+              'en': 'Understanding the full situation.',
+              'my': 'အခြေအနေကို နားလည်ခြင်း။',
+            },
             'examples': [
-              {'sentence': '把握する。'},
+              {
+                'sentence': '状況を把握する。',
+                'translations': {
+                  'en': 'Understand the situation.',
+                  'my': 'အခြေအနေကို နားလည်သည်။',
+                },
+              },
             ],
           },
         ],
@@ -231,13 +242,14 @@ void main() {
       expect(updated!.fileVersions, {'vocabulary': 8, 'decks': 3});
       expect(updated.content.decks.single.contentIds, [id]);
       expect(updated.content.vocabulary[id]!.meanings, ['understanding']);
+      expect(updated.content.vocabulary[id]!.explanation.burmese, isNotEmpty);
       remote.fail = true;
-      expect(
-        (await repository.loadLocal(
-          JlptLevel.n2,
-        )).content.vocabulary[id]!.meanings,
-        ['understanding'],
-      );
+      final cached = (await repository.loadLocal(
+        JlptLevel.n2,
+      )).content.vocabulary[id]!;
+      expect(cached.meanings, ['understanding']);
+      expect(cached.explanation.burmese, isNotEmpty);
+      expect(cached.examples.single.translations.burmese, isNotEmpty);
       expect((await repository.searchLocal(JlptLevel.n2, 'はあく')).single.id, id);
     },
   );

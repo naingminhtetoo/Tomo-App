@@ -12,6 +12,8 @@ class AppRoutes {
   static const learningList = 'learning-list';
   static const session = 'session';
   static const word = 'word';
+  static const kanji = 'kanji-detail';
+  static const grammar = 'grammar-detail';
   static const practiceWord = 'practice-word';
   static const reviewStudy = 'review-study';
 }

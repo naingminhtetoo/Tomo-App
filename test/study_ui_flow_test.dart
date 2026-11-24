@@ -107,9 +107,10 @@ void main() {
         await container.read(progressRepositoryProvider).loadActiveSession(),
         isNull,
       );
-      final id = (await TestVocabularyRepository().loadLocal(
+      final content = (await TestVocabularyRepository().loadLocal(
         JlptLevel.n2,
-      )).content.vocabulary.keys.first;
+      )).content;
+      final id = content.vocabulary.keys.first;
       expect(await container.read(wordProgressProvider(id).future), isNull);
       await shot('learning-list');
       await tester.ensureVisible(find.byTooltip('Add favorite').first);
@@ -124,6 +125,20 @@ void main() {
       await tapText('禁止');
       expect(find.text('禁止'), findsOneWidget);
       expect(find.text('Example Sentences'), findsNothing);
+      expect(find.text('Practice Word'), findsNothing);
+      expect(
+        tester
+            .widget<FilterChip>(find.widgetWithText(FilterChip, 'Favorite'))
+            .selected,
+        isTrue,
+      );
+      await tester.tap(find.widgetWithText(FilterChip, 'Difficult'));
+      await tester.pumpAndSettle();
+      final detailFlags = await container
+          .read(progressRepositoryProvider)
+          .findByCardId(id);
+      expect(detailFlags?.favorite, isTrue);
+      expect(detailFlags?.difficult, isTrue);
       await shot('word-detail');
       final router = container.read(appRouterProvider);
       router.pop();
@@ -132,6 +147,17 @@ void main() {
       expect(find.text('Learn Mode'), findsOneWidget);
       expect(find.text('prohibition'), findsOneWidget);
       expect(find.text('Good'), findsNothing);
+      final chapterSession = (await container
+          .read(progressRepositoryProvider)
+          .loadActiveSession())!;
+      final practicedDeck = content.decks.singleWhere(
+        (deck) => deck.id == chapterSession.deckId,
+      );
+      expect(chapterSession.contentIds.length, greaterThan(1));
+      expect(
+        chapterSession.contentIds.toSet(),
+        practicedDeck.contentIds.where(content.vocabulary.containsKey).toSet(),
+      );
       await shot('learn-mode-visible');
       await tapText('Hide Meaning');
       expect(find.text('prohibition'), findsNothing);

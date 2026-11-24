@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../../app/providers.dart';
-import '../../../app/router/app_routes.dart';
+import '../../../app/theme/tomo_theme.dart';
+import '../../../core/localization/content_language.dart';
+import '../../../core/widgets/learning_detail_components.dart';
 import '../../../core/widgets/tomo_scaffold.dart';
 import '../../../core/widgets/async_status.dart';
 import '../../../core/widgets/ui_action.dart';
@@ -10,6 +11,8 @@ import '../../level_selection/domain/jlpt_level.dart';
 import '../../progress/presentation/progress_providers.dart';
 import '../../progress/presentation/learning_state_controller.dart';
 import '../../progress/domain/progress_repository.dart';
+import '../../settings/presentation/preferences_controller.dart';
+import '../domain/entities/content_example.dart';
 import '../domain/entities/level_content.dart';
 import '../domain/entities/vocabulary_card.dart';
 import 'vocabulary_controller.dart';
@@ -51,12 +54,31 @@ class WordDetailSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context), scheme = Theme.of(context).colorScheme;
+    final selectedLanguage =
+        ref.watch(preferencesControllerProvider).value?.explanationLanguage ??
+        ContentLanguage.english;
     final progress = ref.watch(wordProgressProvider(card.id));
     final mutation = ref.read(learningStateControllerProvider.notifier);
     final busy = ref.watch(learningStateControllerProvider);
     final kanji = content.kanji
         .where((k) => card.kanjiIds.contains(k.id))
         .toList();
+    final authoredExamples = <ContentExample>[
+      ...card.examples,
+      if (card.exampleSentence?.trim().isNotEmpty == true)
+        ContentExample(
+          sentence: card.exampleSentence!,
+          translation: card.exampleTranslation,
+        ),
+    ];
+    final examples = authoredExamples.map((example) {
+      final translation = example.translationFor(selectedLanguage);
+      return LearningExampleData(
+        sentence: example.sentence,
+        translation: translation?.text,
+        translationLanguage: translation?.language,
+      );
+    }).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -136,6 +158,13 @@ class WordDetailSheet extends ConsumerWidget {
             ],
           ),
         ),
+        if (card.explanation.isNotEmpty) ...[
+          const SizedBox(height: TomoSpacing.lg),
+          LearningExplanationSection(
+            explanation: card.explanation,
+            selectedLanguage: selectedLanguage,
+          ),
+        ],
         const SizedBox(height: 24),
         progress.when(
           loading: () => const LinearProgressIndicator(),
@@ -223,61 +252,28 @@ class WordDetailSheet extends ConsumerWidget {
                 .toList(),
           ),
         ],
-        if (card.examples.isNotEmpty || card.exampleSentence != null) ...[
-          const SizedBox(height: 28),
-          const SectionHeading('Example Sentences'),
-          ...card.examples.map(
-            (e) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: SurfacePanel(
-                padding: 20,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(e.sentence, style: theme.textTheme.titleMedium),
-                    if (e.translation != null) ...[
-                      const SizedBox(height: 12),
-                      Text(e.translation!),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
-          if (card.exampleSentence != null)
-            SurfacePanel(
-              padding: 20,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(card.exampleSentence!),
-                  if (card.exampleTranslation != null) ...[
-                    const SizedBox(height: 12),
-                    Text(card.exampleTranslation!),
-                  ],
-                ],
-              ),
-            ),
+        if (examples.isNotEmpty) ...[
+          const SizedBox(height: TomoSpacing.lg),
+          LearningExampleSection(examples: examples),
         ],
         if (card.collocations.isNotEmpty) ...[
-          const SizedBox(height: 28),
-          const SectionHeading('Collocations & Compounds'),
-          ...card.collocations.map(
-            (c) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: SurfacePanel(padding: 18, child: Text(c)),
+          const SizedBox(height: TomoSpacing.lg),
+          LearningDetailSection(
+            title: 'Collocations & Compounds',
+            icon: Icons.hub_outlined,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: card.collocations
+                  .map(
+                    (collocation) => Padding(
+                      padding: const EdgeInsets.only(bottom: TomoSpacing.sm),
+                      child: Text('•  $collocation'),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         ],
-        const SizedBox(height: 28),
-        FilledButton.icon(
-          onPressed: () => context.pushNamed(
-            AppRoutes.practiceWord,
-            pathParameters: {'level': card.level.name, 'id': card.id},
-          ),
-          icon: const Icon(Icons.school_outlined),
-          label: const Text('Practice Word'),
-        ),
       ],
     );
   }

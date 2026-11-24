@@ -149,10 +149,12 @@ class _LearningListScreenState extends ConsumerState<LearningListScreen> {
           _VocabularyList(level: widget.level, words: words),
         if (kanji.isNotEmpty)
           _KanjiList(
+            level: widget.level,
             items: kanji,
             words: catalog.content.vocabulary.values.toList(),
           ),
-        if (grammar.isNotEmpty) _GrammarList(items: grammar),
+        if (grammar.isNotEmpty)
+          _GrammarList(level: widget.level, items: grammar),
         if (words.isEmpty && kanji.isEmpty && grammar.isEmpty)
           TomoEmptyState(
             icon: _query.trim().isEmpty
@@ -294,8 +296,13 @@ class _VocabularyList extends ConsumerWidget {
 }
 
 class _KanjiList extends StatelessWidget {
-  const _KanjiList({required this.items, required this.words});
+  const _KanjiList({
+    required this.level,
+    required this.items,
+    required this.words,
+  });
 
+  final JlptLevel level;
   final List<KanjiContent> items;
   final List<VocabularyCard> words;
 
@@ -325,50 +332,60 @@ class _KanjiList extends StatelessWidget {
         .toList();
     return Padding(
       padding: const EdgeInsets.only(bottom: TomoSpacing.sm),
-      child: SurfacePanel(
-        padding: TomoSpacing.md,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              item.character,
-              style: Theme.of(context).textTheme.headlineLarge,
+      child: Card(
+        child: InkWell(
+          key: Key('kanji-item-${item.id}'),
+          borderRadius: BorderRadius.circular(TomoRadii.card),
+          onTap: () => context.pushNamed(
+            AppRoutes.kanji,
+            pathParameters: {'level': level.name, 'id': item.id},
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(TomoSpacing.md),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.character,
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
+                const SizedBox(width: TomoSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(item.meanings.join(' · ')),
+                      if (item.onyomi.isNotEmpty)
+                        Text('On: ${item.onyomi.join(' · ')}'),
+                      if (item.kunyomi.isNotEmpty)
+                        Text('Kun: ${item.kunyomi.join(' · ')}'),
+                      if (item.strokes != null) Text('${item.strokes} strokes'),
+                      if (related.isNotEmpty)
+                        Text(
+                          '${related.length} related ${related.length == 1 ? 'word' : 'words'}',
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      if (examples.isNotEmpty)
+                        Text(
+                          '${examples.length} ${examples.length == 1 ? 'example' : 'examples'}',
+                          style: TextStyle(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: TomoSpacing.sm),
+                const Icon(Icons.chevron_right),
+              ],
             ),
-            const SizedBox(width: TomoSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(item.meanings.join(' · ')),
-                  if (item.onyomi.isNotEmpty)
-                    Text('On: ${item.onyomi.join(' · ')}'),
-                  if (item.kunyomi.isNotEmpty)
-                    Text('Kun: ${item.kunyomi.join(' · ')}'),
-                  if (item.strokes != null) Text('${item.strokes} strokes'),
-                  if (related.isNotEmpty) ...[
-                    const SizedBox(height: TomoSpacing.sm),
-                    Text(
-                      'Related vocabulary',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    ...related.map(
-                      (word) => Text(
-                        '${word.word} ${word.reading} · ${word.meanings.join(' · ')}',
-                      ),
-                    ),
-                  ],
-                  if (examples.isNotEmpty) ...[
-                    const SizedBox(height: TomoSpacing.sm),
-                    Text(
-                      'Examples',
-                      style: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    ...examples.map(Text.new),
-                  ],
-                ],
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -376,8 +393,9 @@ class _KanjiList extends StatelessWidget {
 }
 
 class _GrammarList extends StatelessWidget {
-  const _GrammarList({required this.items});
+  const _GrammarList({required this.level, required this.items});
 
+  final JlptLevel level;
   final List<GrammarContent> items;
 
   @override
@@ -389,39 +407,49 @@ class _GrammarList extends StatelessWidget {
       ...items.map(
         (item) => Padding(
           padding: const EdgeInsets.only(bottom: TomoSpacing.sm),
-          child: SurfacePanel(
-            padding: TomoSpacing.md,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.pattern,
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                if (item.reading != null) Text(item.reading!),
-                if (item.meanings.isNotEmpty) ...[
-                  const SizedBox(height: TomoSpacing.sm),
-                  Text(item.meanings.join(' · ')),
-                ],
-                if (item.explanation != null) ...[
-                  const SizedBox(height: TomoSpacing.sm),
-                  Text(item.explanation!),
-                ],
-                if (item.formation.isNotEmpty) ...[
-                  const SizedBox(height: TomoSpacing.sm),
-                  Text('Usage: ${item.formation.join(' · ')}'),
-                ],
-                if (item.examples.isNotEmpty) ...[
-                  const SizedBox(height: TomoSpacing.sm),
-                  ...item.examples.map(
-                    (example) => Text(
-                      example.translation == null
-                          ? example.sentence
-                          : '${example.sentence}\n${example.translation}',
+          child: Card(
+            child: InkWell(
+              key: Key('grammar-item-${item.id}'),
+              borderRadius: BorderRadius.circular(TomoRadii.card),
+              onTap: () => context.pushNamed(
+                AppRoutes.grammar,
+                pathParameters: {'level': level.name, 'id': item.id},
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(TomoSpacing.md),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            item.pattern,
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          if (item.reading != null) Text(item.reading!),
+                          if (item.meanings.isNotEmpty) ...[
+                            const SizedBox(height: TomoSpacing.xs),
+                            Text(item.meanings.join(' · ')),
+                          ],
+                          const SizedBox(height: TomoSpacing.xs),
+                          Text(
+                            '${item.examples.length} ${item.examples.length == 1 ? 'example' : 'examples'}',
+                            style: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ],
+                    const SizedBox(width: TomoSpacing.sm),
+                    const Icon(Icons.chevron_right),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

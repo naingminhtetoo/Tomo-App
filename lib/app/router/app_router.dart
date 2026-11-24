@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/widgets/tomo_scaffold.dart';
 import '../../features/flashcards/presentation/flashcard_screen.dart';
 import '../../features/flashcards/presentation/study_controller.dart';
+import '../../features/grammar/presentation/grammar_detail_screen.dart';
+import '../../features/kanji/presentation/kanji_detail_screen.dart';
 import '../../features/study_menu/domain/study_catalog.dart';
 import '../../features/study_menu/presentation/category_screen.dart';
 import '../../features/study_menu/presentation/chapter_screen.dart';
@@ -105,6 +107,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: 'word/:id',
             name: AppRoutes.word,
             builder: (_, state) => WordDetailScreen(
+              level: JlptLevel.tryParse(state.pathParameters['level'])!,
+              id: state.pathParameters['id']!,
+            ),
+          ),
+          GoRoute(
+            path: 'kanji/:id',
+            name: AppRoutes.kanji,
+            builder: (_, state) => KanjiDetailScreen(
+              level: JlptLevel.tryParse(state.pathParameters['level'])!,
+              id: state.pathParameters['id']!,
+            ),
+          ),
+          GoRoute(
+            path: 'grammar/:id',
+            name: AppRoutes.grammar,
+            builder: (_, state) => GrammarDetailScreen(
               level: JlptLevel.tryParse(state.pathParameters['level'])!,
               id: state.pathParameters['id']!,
             ),

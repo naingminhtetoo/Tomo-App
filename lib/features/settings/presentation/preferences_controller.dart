@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/providers.dart';
+import '../../../core/localization/content_language.dart';
 import '../../level_selection/data/app_preferences.dart';
 import '../../level_selection/domain/jlpt_level.dart';
 
@@ -29,6 +30,8 @@ class PreferencesController extends AsyncNotifier<AppPreferences> {
       _save(state.requireValue.copyWith(themeMode: mode));
   Future<void> setShuffle(bool enabled) =>
       _save(state.requireValue.copyWith(shuffle: enabled));
+  Future<void> setExplanationLanguage(ContentLanguage language) =>
+      _save(state.requireValue.copyWith(explanationLanguage: language));
 
   Future<void> rememberLearning(LastLearningActivity activity) {
     final current = state.requireValue;

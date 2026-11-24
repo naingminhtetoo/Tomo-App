@@ -1,4 +1,5 @@
 import '../../../level_selection/domain/jlpt_level.dart';
+import '../../../../core/localization/content_language.dart';
 import 'deck_category.dart';
 import 'content_example.dart';
 
@@ -15,6 +16,7 @@ class VocabularyCard {
     this.romaji,
     this.exampleSentence,
     this.exampleTranslation,
+    this.explanation = const LocalizedText(),
     this.difficulty,
     List<String> tags = const [],
     List<String> partOfSpeech = const [],
@@ -29,6 +31,7 @@ class VocabularyCard {
        collocations = List.unmodifiable(collocations);
   final String id, word, reading;
   final String? romaji;
+  final LocalizedText explanation;
   final List<String> meanings, tags, partOfSpeech, kanjiIds, collocations;
   final List<ContentExample> examples;
   final JlptLevel level;
@@ -48,6 +51,7 @@ class VocabularyCard {
     'examples': examples.map((e) => e.toJson()).toList(),
     'collocations': collocations,
     'tags': tags,
+    if (explanation.isNotEmpty) 'explanation': explanation.toJson(),
     if (romaji != null) 'romaji': romaji,
     if (exampleSentence != null) 'exampleSentence': exampleSentence,
     if (exampleTranslation != null) 'exampleTranslation': exampleTranslation,

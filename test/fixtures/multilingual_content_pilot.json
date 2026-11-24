@@ -1,0 +1,421 @@
+{
+  "schemaVersion": 1,
+  "level": "N2",
+  "vocabulary": [
+    {
+      "id": "pilot_vocab_kaizen",
+      "word": "改善",
+      "reading": "かいぜん",
+      "level": "N2",
+      "meanings": ["improvement", "reform"],
+      "partOfSpeech": ["noun", "suru-verb"],
+      "kanjiIds": ["pilot_kanji_kai", "pilot_kanji_zen"],
+      "explanation": {
+        "ja": "悪いところや問題点を直し、よりよい状態にすること。",
+        "en": "Correcting problems to make a situation better.",
+        "my": "ပြဿနာရှိသော အခြေအနေကို ပြုပြင်ပြီး ပိုကောင်းအောင်လုပ်ခြင်း။"
+      },
+      "examples": [
+        {
+          "sentence": "職場の環境を改善する。",
+          "translations": {
+            "en": "Improve the working environment.",
+            "my": "လုပ်ငန်းခွင်ပတ်ဝန်းကျင်ကို ပိုကောင်းအောင် ပြုပြင်သည်။"
+          }
+        },
+        {
+          "sentence": "サービスには改善の余地がある。",
+          "translations": {
+            "ja": "サービスはもっとよくできる。",
+            "en": "There is room to improve the service."
+          }
+        }
+      ],
+      "collocations": ["業務改善", "環境改善"]
+    },
+    {
+      "id": "pilot_vocab_anzen",
+      "word": "安全",
+      "reading": "あんぜん",
+      "level": "N2",
+      "meanings": ["safety", "security"],
+      "kanjiIds": ["pilot_kanji_zen"],
+      "explanation": {
+        "ja": "危険がなく、安心できる状態。",
+        "en": "A condition in which there is no danger."
+      },
+      "examples": [
+        {
+          "sentence": "安全を確認してから出発する。",
+          "translations": {
+            "en": "Check that it is safe before leaving."
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_toiawase",
+      "word": "問い合わせ",
+      "reading": "といあわせ",
+      "level": "N2",
+      "meanings": ["inquiry", "request for information"],
+      "kanjiIds": ["pilot_kanji_mon"],
+      "explanation": {
+        "ja": "分からないことを相手にたずねて確認すること。"
+      },
+      "examples": [
+        {
+          "sentence": "詳しくは窓口へお問い合わせください。",
+          "translations": {
+            "ja": "詳しい情報は窓口で確認してください。"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_kankyo",
+      "word": "環境",
+      "reading": "かんきょう",
+      "level": "N2",
+      "meanings": ["environment", "surroundings"],
+      "kanjiIds": ["pilot_kanji_kan"],
+      "explanation": {
+        "ja": "人や生物を取り巻く周囲の状態や条件。",
+        "en": "The conditions and surroundings around people or living things.",
+        "my": "လူများ သို့မဟုတ် သက်ရှိများကို ဝန်းရံထားသော အခြေအနေများ။"
+      },
+      "examples": [
+        {
+          "sentence": "静かな環境で勉強したい。",
+          "translations": {
+            "en": "I want to study in a quiet environment.",
+            "my": "တိတ်ဆိတ်သော ပတ်ဝန်းကျင်တွင် စာလေ့လာချင်သည်။"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_keikaku",
+      "word": "計画",
+      "reading": "けいかく",
+      "level": "N2",
+      "meanings": ["plan", "project"],
+      "kanjiIds": ["pilot_kanji_kei"],
+      "explanation": {
+        "ja": "何かを行うために、方法や順序を前もって決めること。",
+        "en": "Deciding methods and steps before doing something.",
+        "my": "တစ်ခုခုလုပ်ရန် နည်းလမ်းနှင့် အစီအစဉ်ကို ကြိုတင်သတ်မှတ်ခြင်း။"
+      },
+      "examples": [
+        {
+          "sentence": "旅行の計画を立てる。",
+          "translation": "Make a travel plan."
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_kakunin",
+      "word": "確認",
+      "reading": "かくにん",
+      "level": "N2",
+      "meanings": ["confirmation", "verification"],
+      "explanation": {
+        "ja": "正しいかどうかを確かめること。",
+        "en": "Checking whether something is correct.",
+        "my": "တစ်စုံတစ်ခု မှန်ကန်မှုရှိမရှိ စစ်ဆေးခြင်း။"
+      },
+      "examples": [
+        {
+          "sentence": "予約内容を確認しました。",
+          "translations": {
+            "en": "I confirmed the reservation details.",
+            "my": "ကြိုတင်မှာယူမှု အသေးစိတ်ကို စစ်ဆေးပြီးပါပြီ။"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_henko",
+      "word": "変更",
+      "reading": "へんこう",
+      "level": "N2",
+      "meanings": ["change", "modification"],
+      "explanation": {
+        "ja": "決まっていた内容を別のものに変えること。",
+        "en": "Changing something that had already been decided."
+      },
+      "examples": [
+        {
+          "sentence": "会議の時間が変更になった。",
+          "translations": {
+            "en": "The meeting time was changed.",
+            "my": "အစည်းအဝေးအချိန် ပြောင်းလဲသွားသည်။"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_tassei",
+      "word": "達成",
+      "reading": "たっせい",
+      "level": "N2",
+      "meanings": ["achievement", "accomplishment"],
+      "explanation": {
+        "ja": "目標や目的を最後まで成し遂げること。",
+        "my": "ရည်မှန်းချက်ကို အဆုံးတိုင် အောင်မြင်စွာ ပြီးမြောက်ခြင်း။"
+      },
+      "examples": [
+        {
+          "sentence": "今年の目標を達成した。",
+          "translations": {
+            "my": "ဒီနှစ် ရည်မှန်းချက်ကို အောင်မြင်ခဲ့သည်။"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_eikyo",
+      "word": "影響",
+      "reading": "えいきょう",
+      "level": "N2",
+      "meanings": ["influence", "effect", "impact"],
+      "explanation": {
+        "ja": "ある物事が別の物事に変化や作用を与えること。",
+        "en": "An effect that one thing has on another.",
+        "my": "အရာတစ်ခုက အခြားအရာတစ်ခုအပေါ် သက်ရောက်မှုရှိခြင်း။"
+      },
+      "examples": [
+        {
+          "sentence": "天候は試合に大きな影響を与えた。",
+          "translations": {
+            "en": "The weather greatly affected the match.",
+            "my": "ရာသီဥတုက ပြိုင်ပွဲအပေါ် အလွန်သက်ရောက်ခဲ့သည်။"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_vocab_taio",
+      "word": "対応",
+      "reading": "たいおう",
+      "level": "N2",
+      "meanings": ["response", "handling", "correspondence"],
+      "explanation": {
+        "ja": "状況や相手に合わせて適切に行動すること。",
+        "en": "Acting appropriately for a situation or person.",
+        "my": "အခြေအနေ သို့မဟုတ် လူပုဂ္ဂိုလ်နှင့် လိုက်လျောညီထွေ တုံ့ပြန်ခြင်း။"
+      },
+      "examples": [
+        {
+          "sentence": "店員が丁寧に対応してくれた。",
+          "translations": {
+            "en": "The staff member helped me politely.",
+            "my": "ဆိုင်ဝန်ထမ်းက ယဉ်ကျေးစွာ ကူညီပေးခဲ့သည်။"
+          }
+        }
+      ]
+    }
+  ],
+  "kanji": [
+    {
+      "id": "pilot_kanji_kai",
+      "character": "改",
+      "level": "N2",
+      "meanings": ["reform", "change", "improve"],
+      "onyomi": ["カイ"],
+      "kunyomi": ["あらた.める", "あらた.まる"],
+      "strokes": 7,
+      "explanation": {
+        "ja": "物事を新しくしたり、よりよい状態にしたりする意味を持つ漢字。",
+        "en": "A kanji associated with changing or improving something.",
+        "my": "ပြောင်းလဲခြင်း သို့မဟုတ် ပိုကောင်းအောင် ပြုပြင်ခြင်းနှင့် သက်ဆိုင်သော ခန်းဂျီး။"
+      },
+      "examples": [
+        {
+          "sentence": "計画を改める。",
+          "translations": {
+            "en": "Revise the plan.",
+            "my": "အစီအစဉ်ကို ပြန်လည်ပြင်ဆင်သည်။"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_kanji_zen",
+      "character": "善",
+      "level": "N2",
+      "meanings": ["good", "virtue"],
+      "onyomi": ["ゼン"],
+      "kunyomi": ["よ.い"],
+      "strokes": 12,
+      "explanation": {
+        "ja": "よいことや正しい行いを表す漢字。",
+        "en": "A kanji expressing goodness or right conduct."
+      },
+      "examples": []
+    },
+    {
+      "id": "pilot_kanji_mon",
+      "character": "問",
+      "level": "N2",
+      "meanings": ["question", "ask", "problem"],
+      "onyomi": ["モン"],
+      "kunyomi": ["と.う", "と.い"],
+      "strokes": 11,
+      "explanation": {
+        "ja": "たずねることや問題を表す漢字。"
+      },
+      "examples": [
+        {
+          "sentence": "先生に質問する。",
+          "translations": {
+            "ja": "先生に分からないことをたずねる。"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_kanji_kan",
+      "character": "環",
+      "level": "N2",
+      "meanings": ["ring", "surround"],
+      "onyomi": ["カン"],
+      "kunyomi": [],
+      "strokes": 17,
+      "explanation": {
+        "ja": "輪のように囲むことを表す漢字。",
+        "en": "A kanji connected with rings and surrounding things.",
+        "my": "ဝိုင်းပတ်ခြင်းနှင့် သက်ဆိုင်သော ခန်းဂျီး။"
+      },
+      "examples": []
+    },
+    {
+      "id": "pilot_kanji_kei",
+      "character": "計",
+      "level": "N2",
+      "meanings": ["measure", "plan", "total"],
+      "onyomi": ["ケイ"],
+      "kunyomi": ["はか.る"],
+      "strokes": 9,
+      "explanation": {
+        "ja": "数をはかったり、計画したりする意味を持つ漢字。",
+        "en": "A kanji used for measuring, calculating, and planning."
+      },
+      "examples": [
+        {
+          "sentence": "時間を計る。",
+          "translation": "Measure the time."
+        }
+      ]
+    }
+  ],
+  "grammar": [
+    {
+      "id": "pilot_grammar_monono",
+      "pattern": "〜ものの",
+      "reading": "ものの",
+      "level": "N2",
+      "meanings": ["although", "even though"],
+      "explanations": {
+        "ja": "予想される結果と実際の結果が違うことを表す。",
+        "en": "Expresses a contrast between an expected and actual result.",
+        "my": "မျှော်လင့်ထားသော ရလဒ်နှင့် အမှန်တကယ်ရလဒ် ကွာခြားမှုကို ဖော်ပြသည်။"
+      },
+      "formation": ["plain form + ものの"],
+      "examples": [
+        {
+          "sentence": "買ったものの、まだ使っていない。",
+          "translations": {
+            "en": "Although I bought it, I have not used it yet.",
+            "my": "ဝယ်ခဲ့ပေမယ့် မသုံးရသေးပါ။"
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_grammar_nioujite",
+      "pattern": "〜に応じて",
+      "reading": "におうじて",
+      "level": "N2",
+      "meanings": ["according to", "in response to"],
+      "explanations": {
+        "ja": "状況や条件が変わると、それに合わせて後の内容も変わることを表す。",
+        "en": "Shows that an action changes according to a condition."
+      },
+      "formation": ["noun + に応じて"],
+      "examples": [
+        {
+          "sentence": "経験に応じて仕事を任せる。",
+          "translations": {
+            "en": "Assign work according to experience."
+          }
+        }
+      ]
+    },
+    {
+      "id": "pilot_grammar_wakeganai",
+      "pattern": "〜わけがない",
+      "reading": "わけがない",
+      "level": "N2",
+      "meanings": ["there is no way", "cannot possibly"],
+      "explanation": "Used when the speaker strongly believes something is impossible.",
+      "formation": ["plain form + わけがない"],
+      "examples": [
+        {
+          "sentence": "彼がそんな約束を忘れるわけがない。",
+          "translation": "There is no way he would forget such a promise."
+        }
+      ]
+    }
+  ],
+  "decks": [
+    {
+      "id": "pilot_vocab_deck",
+      "title": "Multilingual Vocabulary Pilot",
+      "level": "N2",
+      "category": "vocabulary",
+      "source": "test_fixture",
+      "chapter": 1,
+      "contentIds": [
+        "pilot_vocab_kaizen",
+        "pilot_vocab_anzen",
+        "pilot_vocab_toiawase",
+        "pilot_vocab_kankyo",
+        "pilot_vocab_keikaku",
+        "pilot_vocab_kakunin",
+        "pilot_vocab_henko",
+        "pilot_vocab_tassei",
+        "pilot_vocab_eikyo",
+        "pilot_vocab_taio"
+      ]
+    },
+    {
+      "id": "pilot_kanji_deck",
+      "title": "Multilingual Kanji Pilot",
+      "level": "N2",
+      "category": "kanji",
+      "source": "test_fixture",
+      "chapter": 1,
+      "contentIds": [
+        "pilot_kanji_kai",
+        "pilot_kanji_zen",
+        "pilot_kanji_mon",
+        "pilot_kanji_kan",
+        "pilot_kanji_kei"
+      ]
+    },
+    {
+      "id": "pilot_grammar_deck",
+      "title": "Multilingual Grammar Pilot",
+      "level": "N2",
+      "category": "grammar",
+      "source": "test_fixture",
+      "chapter": 1,
+      "contentIds": [
+        "pilot_grammar_monono",
+        "pilot_grammar_nioujite",
+        "pilot_grammar_wakeganai"
+      ]
+    }
+  ]
+}

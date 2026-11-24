@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/tomo_theme.dart';
+import '../../../core/localization/content_language.dart';
 import '../../../core/widgets/async_status.dart';
 import '../../../core/widgets/tomo_components.dart';
 import '../../../core/widgets/tomo_scaffold.dart';
@@ -87,6 +88,16 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: TomoSpacing.lg),
+            const TomoSectionLabel('Learning content'),
+            const SizedBox(height: TomoSpacing.sm),
+            _SettingsGroup(
+              children: [
+                _ExplanationLanguageSelector(
+                  selected: settings.explanationLanguage,
+                ),
+              ],
+            ),
+            const SizedBox(height: TomoSpacing.lg),
             const TomoSectionLabel('Display & aesthetics'),
             const SizedBox(height: TomoSpacing.sm),
             _SettingsGroup(
@@ -145,6 +156,81 @@ class SettingsScreen extends ConsumerWidget {
       ),
     );
   }
+}
+
+class _ExplanationLanguageSelector extends ConsumerWidget {
+  const _ExplanationLanguageSelector({required this.selected});
+
+  final ContentLanguage selected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => Padding(
+    padding: const EdgeInsets.all(TomoSpacing.md),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const TomoIconTile(Icons.translate_outlined),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Explanation language',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  Text(
+                    'Japanese study text stays visible',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: TomoSpacing.md),
+        Container(
+          key: const Key('explanation-language-selector'),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surfaceContainerLowest,
+            borderRadius: BorderRadius.circular(TomoRadii.control),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<ContentLanguage>(
+              value: selected,
+              isExpanded: true,
+              items: ContentLanguage.values
+                  .map(
+                    (language) => DropdownMenuItem(
+                      value: language,
+                      child: Text(
+                        '${language.label} · ${language.nativeLabel}',
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (language) => language == null
+                  ? null
+                  : runUiAction(
+                      context,
+                      () => ref
+                          .read(preferencesControllerProvider.notifier)
+                          .setExplanationLanguage(language),
+                    ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _LevelSelector extends ConsumerWidget {

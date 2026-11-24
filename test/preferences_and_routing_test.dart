@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tomo/app/app.dart';
 import 'package:tomo/app/providers.dart';
 import 'package:tomo/app/router/app_router.dart';
+import 'package:tomo/core/localization/content_language.dart';
 import 'package:tomo/features/level_selection/data/app_preferences.dart';
 import 'package:tomo/features/level_selection/domain/jlpt_level.dart';
 import 'package:tomo/features/settings/presentation/preferences_controller.dart';
@@ -41,6 +42,9 @@ void main() {
       await first.read(preferencesControllerProvider.notifier).setShuffle(true);
       await first
           .read(preferencesControllerProvider.notifier)
+          .setExplanationLanguage(ContentLanguage.burmese);
+      await first
+          .read(preferencesControllerProvider.notifier)
           .rememberLearning(
             const LastLearningActivity(
               level: JlptLevel.n2,
@@ -71,6 +75,7 @@ void main() {
       );
       expect(preferences.themeMode, ThemeMode.light);
       expect(preferences.shuffle, isTrue);
+      expect(preferences.explanationLanguage, ContentLanguage.burmese);
       expect(preferences.lastLearning?.deckId, 'kanji-week-1');
     },
   );
@@ -210,6 +215,8 @@ void main() {
     await tester.tap(find.byTooltip('Settings'));
     await tester.pumpAndSettle();
     final themeSwitch = find.byKey(const Key('theme-switch'));
+    await tester.ensureVisible(themeSwitch);
+    await tester.pumpAndSettle();
     await tester.tap(themeSwitch);
     await tester.pumpAndSettle();
     expect(Theme.of(tester.element(themeSwitch)).brightness, Brightness.light);
